@@ -11,7 +11,7 @@ using UsefulProteomicsDatabases;
 namespace Test
 {
     [TestFixture]
-    public static class DigestionTests
+    public class DigestionTests
     {
 
         //[OneTimeSetUp]
