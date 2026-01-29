@@ -3,66 +3,26 @@
   <PropertyGroup>
     <OutputType>Library</OutputType>
     <TargetFramework>net8.0</TargetFramework>
-    <ApplicationIcon />
-    <StartupObject />
-    <Platforms>x64</Platforms>
-  </PropertyGroup>
-
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <PlatformTarget>x64</PlatformTarget>
-  </PropertyGroup>
-
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-    <PlatformTarget>x64</PlatformTarget>
   </PropertyGroup>
 
   <ItemGroup>
     <PackageReference Include="mzLib" Version="1.0.572" />
-    <PackageReference Include="TopDownProteomics" Version="0.0.287" />
+    <PackageReference Include="TopDownProteomics" Version="0.0.298" />
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Data\" />
-    <Folder Include="ProteolyticDigestion\" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <None Update="Data\elements.dat">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Update="Data\PSI-MOD.obo.xml">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Update="Data\ptmlist.txt">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Update="Data\unimod.xml">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Update="Mods\aListOfmods.txt">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Update="Mods\glyco.txt">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Update="Mods\ProteaseMods.txt">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Update="Mods\Mods.txt">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Update="Mods\substitutions.txt">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Update="Mods\surfactants.txt">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Update="Mods\tmt.txt">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Update="ProteolyticDigestion\proteases.tsv">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
+    <None Update="Data\elements.dat" CopyToOutputDirectory="Always" />
+    <None Update="Data\PSI-MOD.obo.xml" CopyToOutputDirectory="Always" />
+    <None Update="Data\ptmlist.txt" CopyToOutputDirectory="Always" />
+    <None Update="Data\unimod.xml" CopyToOutputDirectory="Always" />
+    <None Update="Mods\aListOfmods.txt" CopyToOutputDirectory="Always" />
+    <None Update="Mods\glyco.txt" CopyToOutputDirectory="Always" />
+    <None Update="Mods\ProteaseMods.txt" CopyToOutputDirectory="Always" />
+    <None Update="Mods\Mods.txt" CopyToOutputDirectory="Always" />
+    <None Update="Mods\substitutions.txt" CopyToOutputDirectory="Always" />
+    <None Update="Mods\surfactants.txt" CopyToOutputDirectory="Always" />
+    <None Update="Mods\tmt.txt" CopyToOutputDirectory="Always" />
+    <None Update="ProteolyticDigestion\proteases.tsv" CopyToOutputDirectory="Always" />
   </ItemGroup>
 
 </Project>

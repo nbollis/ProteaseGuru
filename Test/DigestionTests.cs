@@ -13,16 +13,9 @@ namespace Test
     [TestFixture]
     public class DigestionTests
     {
-
-        //[OneTimeSetUp]
-        //public static void Setup()
-        //{
-
-        //}
         [Test]
         public static void SingleDatabase()
         {
-            Loaders.LoadElements();
             string subFolder = Path.Combine(TestContext.CurrentContext.TestDirectory, @"DigestionTest");
             Directory.CreateDirectory(subFolder);
 
@@ -40,114 +33,110 @@ namespace Test
             DigestionTask digestion = new DigestionTask();
             digestion.DigestionParameters = param;
             var digestionResults = digestion.RunSpecific(subFolder, new List<DbForDigestion>() { database });
-            Assert.AreEqual(1, digestionResults.PeptideByFile.Count);
-            Assert.AreEqual(1, digestionResults.PeptideByFile.Values.Count);
-            Assert.AreEqual(2, digestionResults.PeptideByFile[database.FileName][param.ProteasesForDigestion.First().Name].Count);
+            Assert.That(digestionResults.PeptideByFile.Count, Is.EqualTo(1));
+            Assert.That(digestionResults.PeptideByFile.Values.Count, Is.EqualTo(1));
+            Assert.That(digestionResults.PeptideByFile[database.FileName][param.ProteasesForDigestion.First().Name].Count, Is.EqualTo(2));
             foreach (var entry in digestionResults.PeptideByFile[database.FileName][param.ProteasesForDigestion.First().Name])
             {
                 if (entry.Key.Accession == "testProtein_1")
                 {
-                    Assert.AreEqual(28, entry.Value.Count);
+                    Assert.That(entry.Value.Count, Is.EqualTo(28));
 
-                    Assert.AreEqual("MSFVNGNEIFTAAR", entry.Value[0].BaseSequence);
-                    Assert.IsFalse(entry.Value[0].Unique);
-                    Assert.IsFalse(entry.Value[0].UniqueAllDbs);
-                    Assert.IsTrue(entry.Value[0].SeqOnlyInThisDb);
+                    Assert.That(entry.Value[0].BaseSequence, Is.EqualTo("MSFVNGNEIFTAAR"));
+                    Assert.That(entry.Value[0].Unique, Is.False);
+                    Assert.That(entry.Value[0].UniqueAllDbs, Is.False);
+                    Assert.That(entry.Value[0].SeqOnlyInThisDb, Is.True);
 
-                    Assert.AreEqual("SFVNGNEIFTAAR", entry.Value[1].BaseSequence);
-                    Assert.IsFalse(entry.Value[1].Unique);
-                    Assert.IsFalse(entry.Value[1].UniqueAllDbs);
-                    Assert.IsTrue(entry.Value[1].SeqOnlyInThisDb);
+                    Assert.That(entry.Value[1].BaseSequence, Is.EqualTo("SFVNGNEIFTAAR"));
+                    Assert.That(entry.Value[1].Unique, Is.False);
+                    Assert.That(entry.Value[1].UniqueAllDbs, Is.False);
+                    Assert.That(entry.Value[1].SeqOnlyInThisDb, Is.True);
 
-                    Assert.AreEqual("QGHYAVGAFNTNNLEWTR", entry.Value[2].BaseSequence);
-                    Assert.IsTrue(entry.Value[2].Unique);
-                    Assert.IsTrue(entry.Value[2].UniqueAllDbs);
-                    Assert.IsTrue(entry.Value[2].SeqOnlyInThisDb);
+                    Assert.That(entry.Value[2].BaseSequence, Is.EqualTo("QGHYAVGAFNTNNLEWTR"));
+                    Assert.That(entry.Value[2].Unique, Is.True);
+                    Assert.That(entry.Value[2].UniqueAllDbs, Is.True);
+                    Assert.That(entry.Value[2].SeqOnlyInThisDb, Is.True);
 
-                    Assert.AreEqual("AILK", entry.Value[3].BaseSequence);
-                    Assert.IsTrue(entry.Value[3].Unique);
-                    Assert.IsTrue(entry.Value[3].UniqueAllDbs);
-                    Assert.IsTrue(entry.Value[3].SeqOnlyInThisDb);
+                    Assert.That(entry.Value[3].BaseSequence, Is.EqualTo("AILK"));
+                    Assert.That(entry.Value[3].Unique, Is.True);
+                    Assert.That(entry.Value[3].UniqueAllDbs, Is.True);
+                    Assert.That(entry.Value[3].SeqOnlyInThisDb, Is.True);
 
-                    Assert.AreEqual("AAQEK", entry.Value[5].BaseSequence);
-                    Assert.IsFalse(entry.Value[5].Unique);
-                    Assert.IsFalse(entry.Value[5].UniqueAllDbs);
-                    Assert.IsTrue(entry.Value[5].SeqOnlyInThisDb);
+                    Assert.That(entry.Value[5].BaseSequence, Is.EqualTo("AAQEK"));
+                    Assert.That(entry.Value[5].Unique, Is.False);
+                    Assert.That(entry.Value[5].UniqueAllDbs, Is.False);
+                    Assert.That(entry.Value[5].SeqOnlyInThisDb, Is.True);
 
-                    Assert.AreEqual("NTPVLIQVSMGAAK", entry.Value[6].BaseSequence);
-                    Assert.IsFalse(entry.Value[6].Unique);
-                    Assert.IsFalse(entry.Value[6].UniqueAllDbs);
-                    Assert.IsTrue(entry.Value[6].SeqOnlyInThisDb);
+                    Assert.That(entry.Value[6].BaseSequence, Is.EqualTo("NTPVLIQVSMGAAK"));
+                    Assert.That(entry.Value[6].Unique, Is.False);
+                    Assert.That(entry.Value[6].UniqueAllDbs, Is.False);
+                    Assert.That(entry.Value[6].SeqOnlyInThisDb, Is.True);
 
-                    Assert.AreEqual("YMGDYK", entry.Value[7].BaseSequence);
-                    Assert.IsFalse(entry.Value[7].Unique);
-                    Assert.IsFalse(entry.Value[7].UniqueAllDbs);
-                    Assert.IsTrue(entry.Value[7].SeqOnlyInThisDb);
+                    Assert.That(entry.Value[7].BaseSequence, Is.EqualTo("YMGDYK"));
+                    Assert.That(entry.Value[7].Unique, Is.False);
+                    Assert.That(entry.Value[7].UniqueAllDbs, Is.False);
+                    Assert.That(entry.Value[7].SeqOnlyInThisDb, Is.True);
 
-                    Assert.AreEqual("LVK", entry.Value[8].BaseSequence);
-                    Assert.IsFalse(entry.Value[8].Unique);
-                    Assert.IsFalse(entry.Value[8].UniqueAllDbs);
-                    Assert.IsTrue(entry.Value[8].SeqOnlyInThisDb);
+                    Assert.That(entry.Value[8].BaseSequence, Is.EqualTo("LVK"));
+                    Assert.That(entry.Value[8].Unique, Is.False);
+                    Assert.That(entry.Value[8].UniqueAllDbs, Is.False);
+                    Assert.That(entry.Value[8].SeqOnlyInThisDb, Is.True);
 
-                    Assert.AreEqual("TLVEEEMR", entry.Value[9].BaseSequence);
-                    Assert.IsTrue(entry.Value[9].Unique);
-                    Assert.IsTrue(entry.Value[9].UniqueAllDbs);
-                    Assert.IsTrue(entry.Value[9].SeqOnlyInThisDb);
-
-
+                    Assert.That(entry.Value[9].BaseSequence, Is.EqualTo("TLVEEEMR"));
+                    Assert.That(entry.Value[9].Unique, Is.True);
+                    Assert.That(entry.Value[9].UniqueAllDbs, Is.True);
+                    Assert.That(entry.Value[9].SeqOnlyInThisDb, Is.True);
                 }
                 else if (entry.Key.Accession == "testProtein_2")
                 {
-                    Assert.AreEqual(29, entry.Value.Count);
+                    Assert.That(entry.Value.Count, Is.EqualTo(29));
 
-                    Assert.AreEqual("MSFVNGNEIFTAAR", entry.Value[0].BaseSequence);
-                    Assert.IsFalse(entry.Value[0].Unique);
-                    Assert.IsFalse(entry.Value[0].UniqueAllDbs);
-                    Assert.IsTrue(entry.Value[0].SeqOnlyInThisDb);
+                    Assert.That(entry.Value[0].BaseSequence, Is.EqualTo("MSFVNGNEIFTAAR"));
+                    Assert.That(entry.Value[0].Unique, Is.False);
+                    Assert.That(entry.Value[0].UniqueAllDbs, Is.False);
+                    Assert.That(entry.Value[0].SeqOnlyInThisDb, Is.True);
 
-                    Assert.AreEqual("SFVNGNEIFTAAR", entry.Value[1].BaseSequence);
-                    Assert.IsFalse(entry.Value[1].Unique);
-                    Assert.IsFalse(entry.Value[1].UniqueAllDbs);
-                    Assert.IsTrue(entry.Value[1].SeqOnlyInThisDb);
+                    Assert.That(entry.Value[1].BaseSequence, Is.EqualTo("SFVNGNEIFTAAR"));
+                    Assert.That(entry.Value[1].Unique, Is.False);
+                    Assert.That(entry.Value[1].UniqueAllDbs, Is.False);
+                    Assert.That(entry.Value[1].SeqOnlyInThisDb, Is.True);
 
-                    Assert.AreEqual("AAQEK", entry.Value[2].BaseSequence);
-                    Assert.IsFalse(entry.Value[2].Unique);
-                    Assert.IsFalse(entry.Value[2].UniqueAllDbs);
-                    Assert.IsTrue(entry.Value[2].SeqOnlyInThisDb);
+                    Assert.That(entry.Value[2].BaseSequence, Is.EqualTo("AAQEK"));
+                    Assert.That(entry.Value[2].Unique, Is.False);
+                    Assert.That(entry.Value[2].UniqueAllDbs, Is.False);
+                    Assert.That(entry.Value[2].SeqOnlyInThisDb, Is.True);
 
-                    Assert.AreEqual("QGHPPGAFNTNNLEWTR", entry.Value[23].BaseSequence);
-                    Assert.IsTrue(entry.Value[23].Unique);
-                    Assert.IsTrue(entry.Value[23].UniqueAllDbs);
-                    Assert.IsTrue(entry.Value[23].SeqOnlyInThisDb);
+                    Assert.That(entry.Value[23].BaseSequence, Is.EqualTo("QGHPPGAFNTNNLEWTR"));
+                    Assert.That(entry.Value[23].Unique, Is.True);
+                    Assert.That(entry.Value[23].UniqueAllDbs, Is.True);
+                    Assert.That(entry.Value[23].SeqOnlyInThisDb, Is.True);
 
-                    Assert.AreEqual("AIVK", entry.Value[24].BaseSequence);
-                    Assert.IsTrue(entry.Value[24].Unique);
-                    Assert.IsTrue(entry.Value[24].UniqueAllDbs);
-                    Assert.IsTrue(entry.Value[24].SeqOnlyInThisDb);
+                    Assert.That(entry.Value[24].BaseSequence, Is.EqualTo("AIVK"));
+                    Assert.That(entry.Value[24].Unique, Is.True);
+                    Assert.That(entry.Value[24].UniqueAllDbs, Is.True);
+                    Assert.That(entry.Value[24].SeqOnlyInThisDb, Is.True);
 
-                    Assert.AreEqual("NTPVLIQVSMGAAK", entry.Value[3].BaseSequence);
-                    Assert.IsFalse(entry.Value[3].Unique);
-                    Assert.IsFalse(entry.Value[3].UniqueAllDbs);
-                    Assert.IsTrue(entry.Value[3].SeqOnlyInThisDb);
+                    Assert.That(entry.Value[3].BaseSequence, Is.EqualTo("NTPVLIQVSMGAAK"));
+                    Assert.That(entry.Value[3].Unique, Is.False);
+                    Assert.That(entry.Value[3].UniqueAllDbs, Is.False);
+                    Assert.That(entry.Value[3].SeqOnlyInThisDb, Is.True);
 
-                    Assert.AreEqual("YMGDYK", entry.Value[4].BaseSequence);
-                    Assert.IsFalse(entry.Value[4].Unique);
-                    Assert.IsFalse(entry.Value[4].UniqueAllDbs);
-                    Assert.IsTrue(entry.Value[4].SeqOnlyInThisDb);
+                    Assert.That(entry.Value[4].BaseSequence, Is.EqualTo("YMGDYK"));
+                    Assert.That(entry.Value[4].Unique, Is.False);
+                    Assert.That(entry.Value[4].UniqueAllDbs, Is.False);
+                    Assert.That(entry.Value[4].SeqOnlyInThisDb, Is.True);
 
-                    Assert.AreEqual("LVK", entry.Value[5].BaseSequence);
-                    Assert.IsFalse(entry.Value[5].Unique);
-                    Assert.IsFalse(entry.Value[5].UniqueAllDbs);
-                    Assert.IsTrue(entry.Value[5].SeqOnlyInThisDb);
+                    Assert.That(entry.Value[5].BaseSequence, Is.EqualTo("LVK"));
+                    Assert.That(entry.Value[5].Unique, Is.False);
+                    Assert.That(entry.Value[5].UniqueAllDbs, Is.False);
+                    Assert.That(entry.Value[5].SeqOnlyInThisDb, Is.True);
 
-                    Assert.AreEqual("TLVEPPMR", entry.Value[25].BaseSequence);
-                    Assert.IsTrue(entry.Value[25].Unique);
-                    Assert.IsTrue(entry.Value[25].UniqueAllDbs);
-                    Assert.IsTrue(entry.Value[25].SeqOnlyInThisDb);
-
+                    Assert.That(entry.Value[25].BaseSequence, Is.EqualTo("TLVEPPMR"));
+                    Assert.That(entry.Value[25].Unique, Is.True);
+                    Assert.That(entry.Value[25].UniqueAllDbs, Is.True);
+                    Assert.That(entry.Value[25].SeqOnlyInThisDb, Is.True);
                 }
             }
-
 
             Directory.Delete(subFolder, true);
         }
@@ -155,7 +144,6 @@ namespace Test
         [Test]
         public static void MultipleDatabases()
         {
-            Loaders.LoadElements();
             string subFolder = Path.Combine(TestContext.CurrentContext.TestDirectory, @"DigestionTest");
             Directory.CreateDirectory(subFolder);
 
@@ -179,113 +167,111 @@ namespace Test
             DigestionTask digestion = new DigestionTask();
             digestion.DigestionParameters = param;
             var digestionResults = digestion.RunSpecific(subFolder, new List<DbForDigestion>() { database1, database2, database3 });
-            Assert.AreEqual(3, digestionResults.PeptideByFile.Count);
-            Assert.AreEqual(3, digestionResults.PeptideByFile.Values.Count);
-            Assert.AreEqual(2, digestionResults.PeptideByFile[database1.FileName][param.ProteasesForDigestion.First().Name].Count);
-            Assert.AreEqual(2, digestionResults.PeptideByFile[database2.FileName][param.ProteasesForDigestion.First().Name].Count);
-            Assert.AreEqual(2, digestionResults.PeptideByFile[database3.FileName][param.ProteasesForDigestion.First().Name].Count);
+            Assert.That(digestionResults.PeptideByFile.Count, Is.EqualTo(3));
+            Assert.That(digestionResults.PeptideByFile.Values.Count, Is.EqualTo(3));
+            Assert.That(digestionResults.PeptideByFile[database1.FileName][param.ProteasesForDigestion.First().Name].Count, Is.EqualTo(2));
+            Assert.That(digestionResults.PeptideByFile[database2.FileName][param.ProteasesForDigestion.First().Name].Count, Is.EqualTo(2));
+            Assert.That(digestionResults.PeptideByFile[database3.FileName][param.ProteasesForDigestion.First().Name].Count, Is.EqualTo(2));
+
             foreach (var entry in digestionResults.PeptideByFile[database1.FileName][param.ProteasesForDigestion.First().Name])
             {
                 if (entry.Key.Accession == "testProtein_1")
                 {
-                    Assert.AreEqual(28, entry.Value.Count);
+                    Assert.That(entry.Value.Count, Is.EqualTo(28));
 
-                    Assert.AreEqual("MSFVNGNEIFTAAR", entry.Value[0].BaseSequence);
-                    Assert.IsFalse(entry.Value[0].Unique);
-                    Assert.IsFalse(entry.Value[0].UniqueAllDbs);
-                    Assert.IsFalse(entry.Value[0].SeqOnlyInThisDb);
+                    Assert.That(entry.Value[0].BaseSequence, Is.EqualTo("MSFVNGNEIFTAAR"));
+                    Assert.That(entry.Value[0].Unique, Is.False);
+                    Assert.That(entry.Value[0].UniqueAllDbs, Is.False);
+                    Assert.That(entry.Value[0].SeqOnlyInThisDb, Is.False);
 
-                    Assert.AreEqual("SFVNGNEIFTAAR", entry.Value[1].BaseSequence);
-                    Assert.IsFalse(entry.Value[1].Unique);
-                    Assert.IsFalse(entry.Value[1].UniqueAllDbs);
-                    Assert.IsFalse(entry.Value[1].SeqOnlyInThisDb);
+                    Assert.That(entry.Value[1].BaseSequence, Is.EqualTo("SFVNGNEIFTAAR"));
+                    Assert.That(entry.Value[1].Unique, Is.False);
+                    Assert.That(entry.Value[1].UniqueAllDbs, Is.False);
+                    Assert.That(entry.Value[1].SeqOnlyInThisDb, Is.False);
 
-                    Assert.AreEqual("QGHYAVGAFNTNNLEWTR", entry.Value[2].BaseSequence);
-                    Assert.IsTrue(entry.Value[2].Unique);
-                    Assert.IsFalse(entry.Value[2].UniqueAllDbs);
-                    Assert.IsFalse(entry.Value[2].SeqOnlyInThisDb);
+                    Assert.That(entry.Value[2].BaseSequence, Is.EqualTo("QGHYAVGAFNTNNLEWTR"));
+                    Assert.That(entry.Value[2].Unique, Is.True);
+                    Assert.That(entry.Value[2].UniqueAllDbs, Is.False);
+                    Assert.That(entry.Value[2].SeqOnlyInThisDb, Is.False);
 
-                    Assert.AreEqual("AILK", entry.Value[3].BaseSequence);
-                    Assert.IsTrue(entry.Value[3].Unique);
-                    Assert.IsFalse(entry.Value[3].UniqueAllDbs);
-                    Assert.IsFalse(entry.Value[3].SeqOnlyInThisDb);
+                    Assert.That(entry.Value[3].BaseSequence, Is.EqualTo("AILK"));
+                    Assert.That(entry.Value[3].Unique, Is.True);
+                    Assert.That(entry.Value[3].UniqueAllDbs, Is.False);
+                    Assert.That(entry.Value[3].SeqOnlyInThisDb, Is.False);
 
-                    Assert.AreEqual("AAQEK", entry.Value[5].BaseSequence);
-                    Assert.IsFalse(entry.Value[5].Unique);
-                    Assert.IsFalse(entry.Value[5].UniqueAllDbs);
-                    Assert.IsFalse(entry.Value[5].SeqOnlyInThisDb);
+                    Assert.That(entry.Value[5].BaseSequence, Is.EqualTo("AAQEK"));
+                    Assert.That(entry.Value[5].Unique, Is.False);
+                    Assert.That(entry.Value[5].UniqueAllDbs, Is.False);
+                    Assert.That(entry.Value[5].SeqOnlyInThisDb, Is.False);
 
-                    Assert.AreEqual("NTPVLIQVSMGAAK", entry.Value[6].BaseSequence);
-                    Assert.IsFalse(entry.Value[6].Unique);
-                    Assert.IsFalse(entry.Value[6].UniqueAllDbs);
-                    Assert.IsFalse(entry.Value[6].SeqOnlyInThisDb);
+                    Assert.That(entry.Value[6].BaseSequence, Is.EqualTo("NTPVLIQVSMGAAK"));
+                    Assert.That(entry.Value[6].Unique, Is.False);
+                    Assert.That(entry.Value[6].UniqueAllDbs, Is.False);
+                    Assert.That(entry.Value[6].SeqOnlyInThisDb, Is.False);
 
-                    Assert.AreEqual("YMGDYK", entry.Value[7].BaseSequence);
-                    Assert.IsFalse(entry.Value[7].Unique);
-                    Assert.IsFalse(entry.Value[7].UniqueAllDbs);
-                    Assert.IsFalse(entry.Value[7].SeqOnlyInThisDb);
+                    Assert.That(entry.Value[7].BaseSequence, Is.EqualTo("YMGDYK"));
+                    Assert.That(entry.Value[7].Unique, Is.False);
+                    Assert.That(entry.Value[7].UniqueAllDbs, Is.False);
+                    Assert.That(entry.Value[7].SeqOnlyInThisDb, Is.False);
 
-                    Assert.AreEqual("LVK", entry.Value[8].BaseSequence);
-                    Assert.IsFalse(entry.Value[8].Unique);
-                    Assert.IsFalse(entry.Value[8].UniqueAllDbs);
-                    Assert.IsFalse(entry.Value[8].SeqOnlyInThisDb);
+                    Assert.That(entry.Value[8].BaseSequence, Is.EqualTo("LVK"));
+                    Assert.That(entry.Value[8].Unique, Is.False);
+                    Assert.That(entry.Value[8].UniqueAllDbs, Is.False);
+                    Assert.That(entry.Value[8].SeqOnlyInThisDb, Is.False);
 
-                    Assert.AreEqual("TLVEEEMR", entry.Value[9].BaseSequence);
-                    Assert.IsTrue(entry.Value[9].Unique);
-                    Assert.IsFalse(entry.Value[9].UniqueAllDbs);
-                    Assert.IsFalse(entry.Value[9].SeqOnlyInThisDb);
-
-
+                    Assert.That(entry.Value[9].BaseSequence, Is.EqualTo("TLVEEEMR"));
+                    Assert.That(entry.Value[9].Unique, Is.True);
+                    Assert.That(entry.Value[9].UniqueAllDbs, Is.False);
+                    Assert.That(entry.Value[9].SeqOnlyInThisDb, Is.False);
                 }
                 else if (entry.Key.Accession == "testProtein_2")
                 {
-                    Assert.AreEqual(29, entry.Value.Count);
+                    Assert.That(entry.Value.Count, Is.EqualTo(29));
 
-                    Assert.AreEqual("MSFVNGNEIFTAAR", entry.Value[0].BaseSequence);
-                    Assert.IsFalse(entry.Value[0].Unique);
-                    Assert.IsFalse(entry.Value[0].UniqueAllDbs);
-                    Assert.IsFalse(entry.Value[0].SeqOnlyInThisDb);
+                    Assert.That(entry.Value[0].BaseSequence, Is.EqualTo("MSFVNGNEIFTAAR"));
+                    Assert.That(entry.Value[0].Unique, Is.False);
+                    Assert.That(entry.Value[0].UniqueAllDbs, Is.False);
+                    Assert.That(entry.Value[0].SeqOnlyInThisDb, Is.False);
 
-                    Assert.AreEqual("SFVNGNEIFTAAR", entry.Value[1].BaseSequence);
-                    Assert.IsFalse(entry.Value[1].Unique);
-                    Assert.IsFalse(entry.Value[1].UniqueAllDbs);
-                    Assert.IsFalse(entry.Value[1].SeqOnlyInThisDb);
+                    Assert.That(entry.Value[1].BaseSequence, Is.EqualTo("SFVNGNEIFTAAR"));
+                    Assert.That(entry.Value[1].Unique, Is.False);
+                    Assert.That(entry.Value[1].UniqueAllDbs, Is.False);
+                    Assert.That(entry.Value[1].SeqOnlyInThisDb, Is.False);
 
-                    Assert.AreEqual("AAQEK", entry.Value[2].BaseSequence);
-                    Assert.IsFalse(entry.Value[2].Unique);
-                    Assert.IsFalse(entry.Value[2].UniqueAllDbs);
-                    Assert.IsFalse(entry.Value[2].SeqOnlyInThisDb);
+                    Assert.That(entry.Value[2].BaseSequence, Is.EqualTo("AAQEK"));
+                    Assert.That(entry.Value[2].Unique, Is.False);
+                    Assert.That(entry.Value[2].UniqueAllDbs, Is.False);
+                    Assert.That(entry.Value[2].SeqOnlyInThisDb, Is.False);
 
-                    Assert.AreEqual("QGHPPGAFNTNNLEWTR", entry.Value[23].BaseSequence);
-                    Assert.IsTrue(entry.Value[23].Unique);
-                    Assert.IsFalse(entry.Value[23].UniqueAllDbs);
-                    Assert.IsFalse(entry.Value[23].SeqOnlyInThisDb);
+                    Assert.That(entry.Value[23].BaseSequence, Is.EqualTo("QGHPPGAFNTNNLEWTR"));
+                    Assert.That(entry.Value[23].Unique, Is.True);
+                    Assert.That(entry.Value[23].UniqueAllDbs, Is.False);
+                    Assert.That(entry.Value[23].SeqOnlyInThisDb, Is.False);
 
-                    Assert.AreEqual("AIVK", entry.Value[24].BaseSequence);
-                    Assert.IsTrue(entry.Value[24].Unique);
-                    Assert.IsTrue(entry.Value[24].UniqueAllDbs);
-                    Assert.IsTrue(entry.Value[24].SeqOnlyInThisDb);
+                    Assert.That(entry.Value[24].BaseSequence, Is.EqualTo("AIVK"));
+                    Assert.That(entry.Value[24].Unique, Is.True);
+                    Assert.That(entry.Value[24].UniqueAllDbs, Is.True);
+                    Assert.That(entry.Value[24].SeqOnlyInThisDb, Is.True);
 
-                    Assert.AreEqual("NTPVLIQVSMGAAK", entry.Value[3].BaseSequence);
-                    Assert.IsFalse(entry.Value[3].Unique);
-                    Assert.IsFalse(entry.Value[3].UniqueAllDbs);
-                    Assert.IsFalse(entry.Value[3].SeqOnlyInThisDb);
+                    Assert.That(entry.Value[3].BaseSequence, Is.EqualTo("NTPVLIQVSMGAAK"));
+                    Assert.That(entry.Value[3].Unique, Is.False);
+                    Assert.That(entry.Value[3].UniqueAllDbs, Is.False);
+                    Assert.That(entry.Value[3].SeqOnlyInThisDb, Is.False);
 
-                    Assert.AreEqual("YMGDYK", entry.Value[4].BaseSequence);
-                    Assert.IsFalse(entry.Value[4].Unique);
-                    Assert.IsFalse(entry.Value[4].UniqueAllDbs);
-                    Assert.IsFalse(entry.Value[4].SeqOnlyInThisDb);
+                    Assert.That(entry.Value[4].BaseSequence, Is.EqualTo("YMGDYK"));
+                    Assert.That(entry.Value[4].Unique, Is.False);
+                    Assert.That(entry.Value[4].UniqueAllDbs, Is.False);
+                    Assert.That(entry.Value[4].SeqOnlyInThisDb, Is.False);
 
-                    Assert.AreEqual("LVK", entry.Value[5].BaseSequence);
-                    Assert.IsFalse(entry.Value[5].Unique);
-                    Assert.IsFalse(entry.Value[5].UniqueAllDbs);
-                    Assert.IsFalse(entry.Value[5].SeqOnlyInThisDb);
+                    Assert.That(entry.Value[5].BaseSequence, Is.EqualTo("LVK"));
+                    Assert.That(entry.Value[5].Unique, Is.False);
+                    Assert.That(entry.Value[5].UniqueAllDbs, Is.False);
+                    Assert.That(entry.Value[5].SeqOnlyInThisDb, Is.False);
 
-                    Assert.AreEqual("TLVEPPMR", entry.Value[25].BaseSequence);
-                    Assert.IsTrue(entry.Value[25].Unique);
-                    Assert.IsFalse(entry.Value[25].UniqueAllDbs);
-                    Assert.IsFalse(entry.Value[25].SeqOnlyInThisDb);
-
+                    Assert.That(entry.Value[25].BaseSequence, Is.EqualTo("TLVEPPMR"));
+                    Assert.That(entry.Value[25].Unique, Is.True);
+                    Assert.That(entry.Value[25].UniqueAllDbs, Is.False);
+                    Assert.That(entry.Value[25].SeqOnlyInThisDb, Is.False);
                 }
             }
 
@@ -293,104 +279,101 @@ namespace Test
             {
                 if (entry.Key.Accession == "testProtein_A")
                 {
-                    Assert.AreEqual(28, entry.Value.Count);
+                    Assert.That(entry.Value.Count, Is.EqualTo(28));
 
-                    Assert.AreEqual("MSFVNGNEIFTAAR", entry.Value[0].BaseSequence);
-                    Assert.IsFalse(entry.Value[0].Unique);
-                    Assert.IsFalse(entry.Value[0].UniqueAllDbs);
-                    Assert.IsFalse(entry.Value[0].SeqOnlyInThisDb);
+                    Assert.That(entry.Value[0].BaseSequence, Is.EqualTo("MSFVNGNEIFTAAR"));
+                    Assert.That(entry.Value[0].Unique, Is.False);
+                    Assert.That(entry.Value[0].UniqueAllDbs, Is.False);
+                    Assert.That(entry.Value[0].SeqOnlyInThisDb, Is.False);
 
-                    Assert.AreEqual("SFVNGNEIFTAAR", entry.Value[1].BaseSequence);
-                    Assert.IsFalse(entry.Value[1].Unique);
-                    Assert.IsFalse(entry.Value[1].UniqueAllDbs);
-                    Assert.IsFalse(entry.Value[1].SeqOnlyInThisDb);
+                    Assert.That(entry.Value[1].BaseSequence, Is.EqualTo("SFVNGNEIFTAAR"));
+                    Assert.That(entry.Value[1].Unique, Is.False);
+                    Assert.That(entry.Value[1].UniqueAllDbs, Is.False);
+                    Assert.That(entry.Value[1].SeqOnlyInThisDb, Is.False);
 
-                    Assert.AreEqual("QGHYAVGAFNTNNLEWTR", entry.Value[2].BaseSequence);
-                    Assert.IsTrue(entry.Value[2].Unique);
-                    Assert.IsFalse(entry.Value[2].UniqueAllDbs);
-                    Assert.IsFalse(entry.Value[2].SeqOnlyInThisDb);
+                    Assert.That(entry.Value[2].BaseSequence, Is.EqualTo("QGHYAVGAFNTNNLEWTR"));
+                    Assert.That(entry.Value[2].Unique, Is.True);
+                    Assert.That(entry.Value[2].UniqueAllDbs, Is.False);
+                    Assert.That(entry.Value[2].SeqOnlyInThisDb, Is.False);
 
-                    Assert.AreEqual("AILK", entry.Value[3].BaseSequence);
-                    Assert.IsFalse(entry.Value[3].Unique);
-                    Assert.IsFalse(entry.Value[3].UniqueAllDbs);
-                    Assert.IsFalse(entry.Value[3].SeqOnlyInThisDb);
+                    Assert.That(entry.Value[3].BaseSequence, Is.EqualTo("AILK"));
+                    Assert.That(entry.Value[3].Unique, Is.False);
+                    Assert.That(entry.Value[3].UniqueAllDbs, Is.False);
+                    Assert.That(entry.Value[3].SeqOnlyInThisDb, Is.False);
 
-                    Assert.AreEqual("AAQEK", entry.Value[4].BaseSequence);
-                    Assert.IsFalse(entry.Value[4].Unique);
-                    Assert.IsFalse(entry.Value[4].UniqueAllDbs);
-                    Assert.IsFalse(entry.Value[4].SeqOnlyInThisDb);
+                    Assert.That(entry.Value[4].BaseSequence, Is.EqualTo("AAQEK"));
+                    Assert.That(entry.Value[4].Unique, Is.False);
+                    Assert.That(entry.Value[4].UniqueAllDbs, Is.False);
+                    Assert.That(entry.Value[4].SeqOnlyInThisDb, Is.False);
 
-                    Assert.AreEqual("NTPVLIQVSMGAAK", entry.Value[5].BaseSequence);
-                    Assert.IsFalse(entry.Value[5].Unique);
-                    Assert.IsFalse(entry.Value[5].UniqueAllDbs);
-                    Assert.IsFalse(entry.Value[5].SeqOnlyInThisDb);
+                    Assert.That(entry.Value[5].BaseSequence, Is.EqualTo("NTPVLIQVSMGAAK"));
+                    Assert.That(entry.Value[5].Unique, Is.False);
+                    Assert.That(entry.Value[5].UniqueAllDbs, Is.False);
+                    Assert.That(entry.Value[5].SeqOnlyInThisDb, Is.False);
 
-                    Assert.AreEqual("YMGDYK", entry.Value[6].BaseSequence);
-                    Assert.IsFalse(entry.Value[6].Unique);
-                    Assert.IsFalse(entry.Value[6].UniqueAllDbs);
-                    Assert.IsFalse(entry.Value[6].SeqOnlyInThisDb);
+                    Assert.That(entry.Value[6].BaseSequence, Is.EqualTo("YMGDYK"));
+                    Assert.That(entry.Value[6].Unique, Is.False);
+                    Assert.That(entry.Value[6].UniqueAllDbs, Is.False);
+                    Assert.That(entry.Value[6].SeqOnlyInThisDb, Is.False);
 
-                    Assert.AreEqual("LVK", entry.Value[7].BaseSequence);
-                    Assert.IsFalse(entry.Value[7].Unique);
-                    Assert.IsFalse(entry.Value[7].UniqueAllDbs);
-                    Assert.IsFalse(entry.Value[7].SeqOnlyInThisDb);
+                    Assert.That(entry.Value[7].BaseSequence, Is.EqualTo("LVK"));
+                    Assert.That(entry.Value[7].Unique, Is.False);
+                    Assert.That(entry.Value[7].UniqueAllDbs, Is.False);
+                    Assert.That(entry.Value[7].SeqOnlyInThisDb, Is.False);
 
-                    Assert.AreEqual("TLVEEEMR", entry.Value[8].BaseSequence);
-                    Assert.IsTrue(entry.Value[8].Unique);
-                    Assert.IsFalse(entry.Value[8].UniqueAllDbs);
-                    Assert.IsFalse(entry.Value[8].SeqOnlyInThisDb);
-
-
+                    Assert.That(entry.Value[8].BaseSequence, Is.EqualTo("TLVEEEMR"));
+                    Assert.That(entry.Value[8].Unique, Is.True);
+                    Assert.That(entry.Value[8].UniqueAllDbs, Is.False);
+                    Assert.That(entry.Value[8].SeqOnlyInThisDb, Is.False);
                 }
                 else if (entry.Key.Accession == "testProtein_B")
                 {
-                    Assert.AreEqual(29, entry.Value.Count);
+                    Assert.That(entry.Value.Count, Is.EqualTo(29));
 
-                    Assert.AreEqual("MSFVNGNEIFTAAR", entry.Value[0].BaseSequence);
-                    Assert.IsFalse(entry.Value[0].Unique);
-                    Assert.IsFalse(entry.Value[0].UniqueAllDbs);
-                    Assert.IsFalse(entry.Value[0].SeqOnlyInThisDb);
+                    Assert.That(entry.Value[0].BaseSequence, Is.EqualTo("MSFVNGNEIFTAAR"));
+                    Assert.That(entry.Value[0].Unique, Is.False);
+                    Assert.That(entry.Value[0].UniqueAllDbs, Is.False);
+                    Assert.That(entry.Value[0].SeqOnlyInThisDb, Is.False);
 
-                    Assert.AreEqual("SFVNGNEIFTAAR", entry.Value[1].BaseSequence);
-                    Assert.IsFalse(entry.Value[1].Unique);
-                    Assert.IsFalse(entry.Value[1].UniqueAllDbs);
-                    Assert.IsFalse(entry.Value[1].SeqOnlyInThisDb);
+                    Assert.That(entry.Value[1].BaseSequence, Is.EqualTo("SFVNGNEIFTAAR"));
+                    Assert.That(entry.Value[1].Unique, Is.False);
+                    Assert.That(entry.Value[1].UniqueAllDbs, Is.False);
+                    Assert.That(entry.Value[1].SeqOnlyInThisDb, Is.False);
 
-                    Assert.AreEqual("AILK", entry.Value[2].BaseSequence);
-                    Assert.IsFalse(entry.Value[2].Unique);
-                    Assert.IsFalse(entry.Value[2].UniqueAllDbs);
-                    Assert.IsFalse(entry.Value[2].SeqOnlyInThisDb);
+                    Assert.That(entry.Value[2].BaseSequence, Is.EqualTo("AILK"));
+                    Assert.That(entry.Value[2].Unique, Is.False);
+                    Assert.That(entry.Value[2].UniqueAllDbs, Is.False);
+                    Assert.That(entry.Value[2].SeqOnlyInThisDb, Is.False);
 
-                    Assert.AreEqual("AAQEK", entry.Value[3].BaseSequence);
-                    Assert.IsFalse(entry.Value[3].Unique);
-                    Assert.IsFalse(entry.Value[3].UniqueAllDbs);
-                    Assert.IsFalse(entry.Value[3].SeqOnlyInThisDb);
+                    Assert.That(entry.Value[3].BaseSequence, Is.EqualTo("AAQEK"));
+                    Assert.That(entry.Value[3].Unique, Is.False);
+                    Assert.That(entry.Value[3].UniqueAllDbs, Is.False);
+                    Assert.That(entry.Value[3].SeqOnlyInThisDb, Is.False);
 
-                    Assert.AreEqual("QGHPPGAFNTNNLEWTR", entry.Value[25].BaseSequence);
-                    Assert.IsTrue(entry.Value[25].Unique);
-                    Assert.IsFalse(entry.Value[25].UniqueAllDbs);
-                    Assert.IsFalse(entry.Value[25].SeqOnlyInThisDb);
+                    Assert.That(entry.Value[25].BaseSequence, Is.EqualTo("QGHPPGAFNTNNLEWTR"));
+                    Assert.That(entry.Value[25].Unique, Is.True);
+                    Assert.That(entry.Value[25].UniqueAllDbs, Is.False);
+                    Assert.That(entry.Value[25].SeqOnlyInThisDb, Is.False);
 
-                    Assert.AreEqual("NTPVLIQVSMGAAK", entry.Value[4].BaseSequence);
-                    Assert.IsFalse(entry.Value[4].Unique);
-                    Assert.IsFalse(entry.Value[4].UniqueAllDbs);
-                    Assert.IsFalse(entry.Value[4].SeqOnlyInThisDb);
+                    Assert.That(entry.Value[4].BaseSequence, Is.EqualTo("NTPVLIQVSMGAAK"));
+                    Assert.That(entry.Value[4].Unique, Is.False);
+                    Assert.That(entry.Value[4].UniqueAllDbs, Is.False);
+                    Assert.That(entry.Value[4].SeqOnlyInThisDb, Is.False);
 
-                    Assert.AreEqual("YMGDYK", entry.Value[5].BaseSequence);
-                    Assert.IsFalse(entry.Value[5].Unique);
-                    Assert.IsFalse(entry.Value[5].UniqueAllDbs);
-                    Assert.IsFalse(entry.Value[5].SeqOnlyInThisDb);
+                    Assert.That(entry.Value[5].BaseSequence, Is.EqualTo("YMGDYK"));
+                    Assert.That(entry.Value[5].Unique, Is.False);
+                    Assert.That(entry.Value[5].UniqueAllDbs, Is.False);
+                    Assert.That(entry.Value[5].SeqOnlyInThisDb, Is.False);
 
-                    Assert.AreEqual("LVK", entry.Value[6].BaseSequence);
-                    Assert.IsFalse(entry.Value[6].Unique);
-                    Assert.IsFalse(entry.Value[6].UniqueAllDbs);
-                    Assert.IsFalse(entry.Value[6].SeqOnlyInThisDb);
+                    Assert.That(entry.Value[6].BaseSequence, Is.EqualTo("LVK"));
+                    Assert.That(entry.Value[6].Unique, Is.False);
+                    Assert.That(entry.Value[6].UniqueAllDbs, Is.False);
+                    Assert.That(entry.Value[6].SeqOnlyInThisDb, Is.False);
 
-                    Assert.AreEqual("TLVEPPMR", entry.Value[26].BaseSequence);
-                    Assert.IsTrue(entry.Value[26].Unique);
-                    Assert.IsFalse(entry.Value[26].UniqueAllDbs);
-                    Assert.IsFalse(entry.Value[26].SeqOnlyInThisDb);
-
+                    Assert.That(entry.Value[26].BaseSequence, Is.EqualTo("TLVEPPMR"));
+                    Assert.That(entry.Value[26].Unique, Is.True);
+                    Assert.That(entry.Value[26].UniqueAllDbs, Is.False);
+                    Assert.That(entry.Value[26].SeqOnlyInThisDb, Is.False);
                 }
             }
 
@@ -398,111 +381,105 @@ namespace Test
             {
                 if (entry.Key.Accession == "testProtein_one")
                 {
-                    Assert.AreEqual(28, entry.Value.Count);
+                    Assert.That(entry.Value.Count, Is.EqualTo(28));
 
-                    Assert.AreEqual("MSFVNGNEIFTAAR", entry.Value[0].BaseSequence);
-                    Assert.IsTrue(entry.Value[0].Unique);
-                    Assert.IsFalse(entry.Value[0].UniqueAllDbs);
-                    Assert.IsFalse(entry.Value[0].SeqOnlyInThisDb);
+                    Assert.That(entry.Value[0].BaseSequence, Is.EqualTo("MSFVNGNEIFTAAR"));
+                    Assert.That(entry.Value[0].Unique, Is.True);
+                    Assert.That(entry.Value[0].UniqueAllDbs, Is.False);
+                    Assert.That(entry.Value[0].SeqOnlyInThisDb, Is.False);
 
-                    Assert.AreEqual("SFVNGNEIFTAAR", entry.Value[1].BaseSequence);
-                    Assert.IsTrue(entry.Value[1].Unique);
-                    Assert.IsFalse(entry.Value[1].UniqueAllDbs);
-                    Assert.IsFalse(entry.Value[1].SeqOnlyInThisDb);
+                    Assert.That(entry.Value[1].BaseSequence, Is.EqualTo("SFVNGNEIFTAAR"));
+                    Assert.That(entry.Value[1].Unique, Is.True);
+                    Assert.That(entry.Value[1].UniqueAllDbs, Is.False);
+                    Assert.That(entry.Value[1].SeqOnlyInThisDb, Is.False);
 
-                    Assert.AreEqual("MGHAVVGAFNTNNLEWTR", entry.Value[2].BaseSequence);
-                    Assert.IsTrue(entry.Value[2].Unique);
-                    Assert.IsTrue(entry.Value[2].UniqueAllDbs);
-                    Assert.IsTrue(entry.Value[2].SeqOnlyInThisDb);
+                    Assert.That(entry.Value[2].BaseSequence, Is.EqualTo("MGHAVVGAFNTNNLEWTR"));
+                    Assert.That(entry.Value[2].Unique, Is.True);
+                    Assert.That(entry.Value[2].UniqueAllDbs, Is.True);
+                    Assert.That(entry.Value[2].SeqOnlyInThisDb, Is.True);
 
-                    Assert.AreEqual("AILK", entry.Value[3].BaseSequence);
-                    Assert.IsFalse(entry.Value[3].Unique);
-                    Assert.IsFalse(entry.Value[3].UniqueAllDbs);
-                    Assert.IsFalse(entry.Value[3].SeqOnlyInThisDb);
+                    Assert.That(entry.Value[3].BaseSequence, Is.EqualTo("AILK"));
+                    Assert.That(entry.Value[3].Unique, Is.False);
+                    Assert.That(entry.Value[3].UniqueAllDbs, Is.False);
+                    Assert.That(entry.Value[3].SeqOnlyInThisDb, Is.False);
 
-                    Assert.AreEqual("AAQEK", entry.Value[4].BaseSequence);
-                    Assert.IsFalse(entry.Value[4].Unique);
-                    Assert.IsFalse(entry.Value[4].UniqueAllDbs);
-                    Assert.IsFalse(entry.Value[4].SeqOnlyInThisDb);
+                    Assert.That(entry.Value[4].BaseSequence, Is.EqualTo("AAQEK"));
+                    Assert.That(entry.Value[4].Unique, Is.False);
+                    Assert.That(entry.Value[4].UniqueAllDbs, Is.False);
+                    Assert.That(entry.Value[4].SeqOnlyInThisDb, Is.False);
 
-                    Assert.AreEqual("NTPVLIQVSMGAAK", entry.Value[5].BaseSequence);
-                    Assert.IsTrue(entry.Value[5].Unique);
-                    Assert.IsFalse(entry.Value[5].UniqueAllDbs);
-                    Assert.IsFalse(entry.Value[5].SeqOnlyInThisDb);
+                    Assert.That(entry.Value[5].BaseSequence, Is.EqualTo("NTPVLIQVSMGAAK"));
+                    Assert.That(entry.Value[5].Unique, Is.True);
+                    Assert.That(entry.Value[5].UniqueAllDbs, Is.False);
+                    Assert.That(entry.Value[5].SeqOnlyInThisDb, Is.False);
 
-                    Assert.AreEqual("YMGDYK", entry.Value[6].BaseSequence);
-                    Assert.IsFalse(entry.Value[6].Unique);
-                    Assert.IsFalse(entry.Value[6].UniqueAllDbs);
-                    Assert.IsFalse(entry.Value[6].SeqOnlyInThisDb);
+                    Assert.That(entry.Value[6].BaseSequence, Is.EqualTo("YMGDYK"));
+                    Assert.That(entry.Value[6].Unique, Is.False);
+                    Assert.That(entry.Value[6].UniqueAllDbs, Is.False);
+                    Assert.That(entry.Value[6].SeqOnlyInThisDb, Is.False);
 
-                    Assert.AreEqual("LVK", entry.Value[7].BaseSequence);
-                    Assert.IsFalse(entry.Value[7].Unique);
-                    Assert.IsFalse(entry.Value[7].UniqueAllDbs);
-                    Assert.IsFalse(entry.Value[7].SeqOnlyInThisDb);
+                    Assert.That(entry.Value[7].BaseSequence, Is.EqualTo("LVK"));
+                    Assert.That(entry.Value[7].Unique, Is.False);
+                    Assert.That(entry.Value[7].UniqueAllDbs, Is.False);
+                    Assert.That(entry.Value[7].SeqOnlyInThisDb, Is.False);
 
-                    Assert.AreEqual("TLVEEEMR", entry.Value[8].BaseSequence);
-                    Assert.IsTrue(entry.Value[8].Unique);
-                    Assert.IsFalse(entry.Value[8].UniqueAllDbs);
-                    Assert.IsFalse(entry.Value[8].SeqOnlyInThisDb);
-
-
+                    Assert.That(entry.Value[8].BaseSequence, Is.EqualTo("TLVEEEMR"));
+                    Assert.That(entry.Value[8].Unique, Is.True);
+                    Assert.That(entry.Value[8].UniqueAllDbs, Is.False);
+                    Assert.That(entry.Value[8].SeqOnlyInThisDb, Is.False);
                 }
                 else if (entry.Key.Accession == "testProtein_two")
                 {
-                    Assert.AreEqual(29, entry.Value.Count);
+                    Assert.That(entry.Value.Count, Is.EqualTo(29));
 
-                    Assert.AreEqual("MSFVNGNEIFTQER", entry.Value[19].BaseSequence);
-                    Assert.IsTrue(entry.Value[19].Unique);
-                    Assert.IsTrue(entry.Value[19].UniqueAllDbs);
-                    Assert.IsTrue(entry.Value[19].SeqOnlyInThisDb);
+                    Assert.That(entry.Value[19].BaseSequence, Is.EqualTo("MSFVNGNEIFTQER"));
+                    Assert.That(entry.Value[19].Unique, Is.True);
+                    Assert.That(entry.Value[19].UniqueAllDbs, Is.True);
+                    Assert.That(entry.Value[19].SeqOnlyInThisDb, Is.True);
 
-                    Assert.AreEqual("QGHPPGAFNTNNLEWTR", entry.Value[21].BaseSequence);
-                    Assert.IsTrue(entry.Value[21].Unique);
-                    Assert.IsFalse(entry.Value[21].UniqueAllDbs);
-                    Assert.IsFalse(entry.Value[21].SeqOnlyInThisDb);
+                    Assert.That(entry.Value[21].BaseSequence, Is.EqualTo("QGHPPGAFNTNNLEWTR"));
+                    Assert.That(entry.Value[21].Unique, Is.True);
+                    Assert.That(entry.Value[21].UniqueAllDbs, Is.False);
+                    Assert.That(entry.Value[21].SeqOnlyInThisDb, Is.False);
 
-                    Assert.AreEqual("AILK", entry.Value[0].BaseSequence);
-                    Assert.IsFalse(entry.Value[0].Unique);
-                    Assert.IsFalse(entry.Value[0].UniqueAllDbs);
-                    Assert.IsFalse(entry.Value[0].SeqOnlyInThisDb);
+                    Assert.That(entry.Value[0].BaseSequence, Is.EqualTo("AILK"));
+                    Assert.That(entry.Value[0].Unique, Is.False);
+                    Assert.That(entry.Value[0].UniqueAllDbs, Is.False);
+                    Assert.That(entry.Value[0].SeqOnlyInThisDb, Is.False);
 
-                    Assert.AreEqual("AAQEK", entry.Value[1].BaseSequence);
-                    Assert.IsFalse(entry.Value[1].Unique);
-                    Assert.IsFalse(entry.Value[1].UniqueAllDbs);
-                    Assert.IsFalse(entry.Value[1].SeqOnlyInThisDb);
+                    Assert.That(entry.Value[1].BaseSequence, Is.EqualTo("AAQEK"));
+                    Assert.That(entry.Value[1].Unique, Is.False);
+                    Assert.That(entry.Value[1].UniqueAllDbs, Is.False);
+                    Assert.That(entry.Value[1].SeqOnlyInThisDb, Is.False);
 
-                    Assert.AreEqual("NTPVLIQVSMGAAVR", entry.Value[22].BaseSequence);
-                    Assert.IsTrue(entry.Value[22].Unique);
-                    Assert.IsTrue(entry.Value[22].UniqueAllDbs);
-                    Assert.IsTrue(entry.Value[22].SeqOnlyInThisDb);
+                    Assert.That(entry.Value[22].BaseSequence, Is.EqualTo("NTPVLIQVSMGAAVR"));
+                    Assert.That(entry.Value[22].Unique, Is.True);
+                    Assert.That(entry.Value[22].UniqueAllDbs, Is.True);
+                    Assert.That(entry.Value[22].SeqOnlyInThisDb, Is.True);
 
-                    Assert.AreEqual("YMGDYK", entry.Value[2].BaseSequence);
-                    Assert.IsFalse(entry.Value[2].Unique);
-                    Assert.IsFalse(entry.Value[2].UniqueAllDbs);
-                    Assert.IsFalse(entry.Value[2].SeqOnlyInThisDb);
+                    Assert.That(entry.Value[2].BaseSequence, Is.EqualTo("YMGDYK"));
+                    Assert.That(entry.Value[2].Unique, Is.False);
+                    Assert.That(entry.Value[2].UniqueAllDbs, Is.False);
+                    Assert.That(entry.Value[2].SeqOnlyInThisDb, Is.False);
 
-                    Assert.AreEqual("LVK", entry.Value[3].BaseSequence);
-                    Assert.IsFalse(entry.Value[3].Unique);
-                    Assert.IsFalse(entry.Value[3].UniqueAllDbs);
-                    Assert.IsFalse(entry.Value[3].SeqOnlyInThisDb);
+                    Assert.That(entry.Value[3].BaseSequence, Is.EqualTo("LVK"));
+                    Assert.That(entry.Value[3].Unique, Is.False);
+                    Assert.That(entry.Value[3].UniqueAllDbs, Is.False);
+                    Assert.That(entry.Value[3].SeqOnlyInThisDb, Is.False);
 
-                    Assert.AreEqual("TLVEPPMR", entry.Value[23].BaseSequence);
-                    Assert.IsTrue(entry.Value[23].Unique);
-                    Assert.IsFalse(entry.Value[23].UniqueAllDbs);
-                    Assert.IsFalse(entry.Value[23].SeqOnlyInThisDb);
-
+                    Assert.That(entry.Value[23].BaseSequence, Is.EqualTo("TLVEPPMR"));
+                    Assert.That(entry.Value[23].Unique, Is.True);
+                    Assert.That(entry.Value[23].UniqueAllDbs, Is.False);
+                    Assert.That(entry.Value[23].SeqOnlyInThisDb, Is.False);
                 }
             }
 
-
             Directory.Delete(subFolder, true);
-
         }
 
         [Test]
         public static void ProteaseModTest()
         {
-            Loaders.LoadElements();
             string subFolder = Path.Combine(TestContext.CurrentContext.TestDirectory, @"DigestionTest");
             Directory.CreateDirectory(subFolder);
 
@@ -526,17 +503,16 @@ namespace Test
             foreach (var entry in digestionResults.PeptideByFile[database1.FileName][param.ProteasesForDigestion.First().Name])
             {
                 var peptides = entry.Value;
-                Assert.AreEqual(2, peptides.Count());
-                Assert.AreNotEqual(peptides[0].FullSequence, peptides[1].FullSequence);
-                Assert.AreEqual(882.39707781799996, peptides[0].MolecularWeight);
-                Assert.AreEqual(930.400449121, peptides[1].MolecularWeight);
+                Assert.That(peptides.Count(), Is.EqualTo(2));
+                Assert.That(peptides[0].FullSequence, Is.Not.EqualTo(peptides[1].FullSequence));
+                Assert.That(peptides[0].MolecularWeight, Is.EqualTo(882.39707781799996));
+                Assert.That(peptides[1].MolecularWeight, Is.EqualTo(930.400449121));
             }
         }
 
         [Test]
         public static void InitiatorMethionineTest()
         {
-            Loaders.LoadElements();
             string subFolder = Path.Combine(TestContext.CurrentContext.TestDirectory, @"DigestionTest");
             Directory.CreateDirectory(subFolder);
 
@@ -560,39 +536,33 @@ namespace Test
             DigestionTask digestion = new DigestionTask();
             digestion.DigestionParameters = param;
             var digestionResults = digestion.RunSpecific(subFolder, new List<DbForDigestion>() { database1, database2, database3 });
-            Assert.AreEqual(3, digestionResults.PeptideByFile.Count);
-            Assert.AreEqual(3, digestionResults.PeptideByFile.Values.Count);
-            Assert.AreEqual(2, digestionResults.PeptideByFile[database1.FileName][param.ProteasesForDigestion.First().Name].Count);
-            Assert.AreEqual(2, digestionResults.PeptideByFile[database2.FileName][param.ProteasesForDigestion.First().Name].Count);
-            Assert.AreEqual(2, digestionResults.PeptideByFile[database3.FileName][param.ProteasesForDigestion.First().Name].Count);
+            Assert.That(digestionResults.PeptideByFile.Count, Is.EqualTo(3));
+            Assert.That(digestionResults.PeptideByFile.Values.Count, Is.EqualTo(3));
+            Assert.That(digestionResults.PeptideByFile[database1.FileName][param.ProteasesForDigestion.First().Name].Count, Is.EqualTo(2));
+            Assert.That(digestionResults.PeptideByFile[database2.FileName][param.ProteasesForDigestion.First().Name].Count, Is.EqualTo(2));
+            Assert.That(digestionResults.PeptideByFile[database3.FileName][param.ProteasesForDigestion.First().Name].Count, Is.EqualTo(2));
+
             foreach (var entry in digestionResults.PeptideByFile[database1.FileName][param.ProteasesForDigestion.First().Name])
             {
                 if (entry.Key.Accession == "testProtein_1")
                 {
+                    Assert.That(entry.Value[0].BaseSequence, Is.EqualTo("MSFVNGNEIFTAAR"));
+                    Assert.That(entry.Value[0].PreviousAA, Is.EqualTo('-'));
+                    Assert.That(entry.Value[0].StartResidue, Is.EqualTo(1));
 
-                    Assert.AreEqual("MSFVNGNEIFTAAR", entry.Value[0].BaseSequence);
-                    Assert.AreEqual('-', entry.Value[0].PreviousAA);
-                    Assert.AreEqual(1, entry.Value[0].StartResidue);
-
-
-                    Assert.AreEqual("SFVNGNEIFTAAR", entry.Value[1].BaseSequence);
-                    Assert.AreEqual('M', entry.Value[1].PreviousAA);
-                    Assert.AreEqual(2, entry.Value[1].StartResidue);
-
-
+                    Assert.That(entry.Value[1].BaseSequence, Is.EqualTo("SFVNGNEIFTAAR"));
+                    Assert.That(entry.Value[1].PreviousAA, Is.EqualTo('M'));
+                    Assert.That(entry.Value[1].StartResidue, Is.EqualTo(2));
                 }
                 else if (entry.Key.Accession == "testProtein_2")
                 {
+                    Assert.That(entry.Value[0].BaseSequence, Is.EqualTo("MSFVNGNEIFTAAR"));
+                    Assert.That(entry.Value[0].PreviousAA, Is.EqualTo('-'));
+                    Assert.That(entry.Value[0].StartResidue, Is.EqualTo(1));
 
-
-                    Assert.AreEqual("MSFVNGNEIFTAAR", entry.Value[0].BaseSequence);
-                    Assert.AreEqual('-', entry.Value[0].PreviousAA);
-                    Assert.AreEqual(1, entry.Value[0].StartResidue);
-
-                    Assert.AreEqual("SFVNGNEIFTAAR", entry.Value[1].BaseSequence);
-                    Assert.AreEqual('M', entry.Value[1].PreviousAA);
-                    Assert.AreEqual(2, entry.Value[1].StartResidue);
-
+                    Assert.That(entry.Value[1].BaseSequence, Is.EqualTo("SFVNGNEIFTAAR"));
+                    Assert.That(entry.Value[1].PreviousAA, Is.EqualTo('M'));
+                    Assert.That(entry.Value[1].StartResidue, Is.EqualTo(2));
                 }
             }
 
@@ -600,29 +570,23 @@ namespace Test
             {
                 if (entry.Key.Accession == "testProtein_A")
                 {
+                    Assert.That(entry.Value[0].BaseSequence, Is.EqualTo("MSFVNGNEIFTAAR"));
+                    Assert.That(entry.Value[0].PreviousAA, Is.EqualTo('-'));
+                    Assert.That(entry.Value[0].StartResidue, Is.EqualTo(1));
 
-                    Assert.AreEqual("MSFVNGNEIFTAAR", entry.Value[0].BaseSequence);
-                    Assert.AreEqual('-', entry.Value[0].PreviousAA);
-                    Assert.AreEqual(1, entry.Value[0].StartResidue);
-
-                    Assert.AreEqual("SFVNGNEIFTAAR", entry.Value[1].BaseSequence);
-                    Assert.AreEqual('M', entry.Value[1].PreviousAA);
-                    Assert.AreEqual(2, entry.Value[1].StartResidue);
-
-
+                    Assert.That(entry.Value[1].BaseSequence, Is.EqualTo("SFVNGNEIFTAAR"));
+                    Assert.That(entry.Value[1].PreviousAA, Is.EqualTo('M'));
+                    Assert.That(entry.Value[1].StartResidue, Is.EqualTo(2));
                 }
                 else if (entry.Key.Accession == "testProtein_B")
                 {
+                    Assert.That(entry.Value[0].BaseSequence, Is.EqualTo("MSFVNGNEIFTAAR"));
+                    Assert.That(entry.Value[0].PreviousAA, Is.EqualTo('-'));
+                    Assert.That(entry.Value[0].StartResidue, Is.EqualTo(1));
 
-                    Assert.AreEqual("MSFVNGNEIFTAAR", entry.Value[0].BaseSequence);
-                    Assert.AreEqual('-', entry.Value[0].PreviousAA);
-                    Assert.AreEqual(1, entry.Value[0].StartResidue);
-
-                    Assert.AreEqual("SFVNGNEIFTAAR", entry.Value[1].BaseSequence);
-                    Assert.AreEqual('M', entry.Value[1].PreviousAA);
-                    Assert.AreEqual(2, entry.Value[1].StartResidue);
-
-
+                    Assert.That(entry.Value[1].BaseSequence, Is.EqualTo("SFVNGNEIFTAAR"));
+                    Assert.That(entry.Value[1].PreviousAA, Is.EqualTo('M'));
+                    Assert.That(entry.Value[1].StartResidue, Is.EqualTo(2));
                 }
             }
 
@@ -630,30 +594,25 @@ namespace Test
             {
                 if (entry.Key.Accession == "testProtein_one")
                 {
+                    Assert.That(entry.Value[0].BaseSequence, Is.EqualTo("MSFVNGNEIFTAAR"));
+                    Assert.That(entry.Value[0].PreviousAA, Is.EqualTo('-'));
+                    Assert.That(entry.Value[0].StartResidue, Is.EqualTo(1));
 
-                    Assert.AreEqual("MSFVNGNEIFTAAR", entry.Value[0].BaseSequence);
-                    Assert.AreEqual('-', entry.Value[0].PreviousAA);
-                    Assert.AreEqual(1, entry.Value[0].StartResidue);
-
-                    Assert.AreEqual("SFVNGNEIFTAAR", entry.Value[1].BaseSequence);
-                    Assert.AreEqual('M', entry.Value[1].PreviousAA);
-                    Assert.AreEqual(2, entry.Value[1].StartResidue);
-
+                    Assert.That(entry.Value[1].BaseSequence, Is.EqualTo("SFVNGNEIFTAAR"));
+                    Assert.That(entry.Value[1].PreviousAA, Is.EqualTo('M'));
+                    Assert.That(entry.Value[1].StartResidue, Is.EqualTo(2));
                 }
                 else if (entry.Key.Accession == "testProtein_two")
                 {
+                    Assert.That(entry.Value[19].BaseSequence, Is.EqualTo("MSFVNGNEIFTQER"));
+                    Assert.That(entry.Value[19].PreviousAA, Is.EqualTo('-'));
+                    Assert.That(entry.Value[19].StartResidue, Is.EqualTo(1));
 
-                    Assert.AreEqual("MSFVNGNEIFTQER", entry.Value[19].BaseSequence);
-                    Assert.AreEqual('-', entry.Value[19].PreviousAA);
-                    Assert.AreEqual(1, entry.Value[19].StartResidue);
-
-                    Assert.AreEqual("SFVNGNEIFTQER", entry.Value[20].BaseSequence);
-                    Assert.AreEqual('M', entry.Value[20].PreviousAA);
-                    Assert.AreEqual(2, entry.Value[20].StartResidue);
-
+                    Assert.That(entry.Value[20].BaseSequence, Is.EqualTo("SFVNGNEIFTQER"));
+                    Assert.That(entry.Value[20].PreviousAA, Is.EqualTo('M'));
+                    Assert.That(entry.Value[20].StartResidue, Is.EqualTo(2));
                 }
             }
-
 
             Directory.Delete(subFolder, true);
         }
