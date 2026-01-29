@@ -67,8 +67,7 @@ namespace Engine
                 }
             }
 
-            ElementsLocation = Path.Combine(DataDir, @"Data", @"elements.dat");
-            UsefulProteomicsDatabases.Loaders.LoadElements();            
+            ElementsLocation = Path.Combine(DataDir, @"Data", @"elements.dat");         
 
             UnimodDeserialized = UsefulProteomicsDatabases.Loaders.LoadUnimod(Path.Combine(DataDir, @"Data", @"unimod.xml")).ToList();
             PsiModDeserialized = UsefulProteomicsDatabases.Loaders.LoadPsiMod(Path.Combine(DataDir, @"Data", @"PSI-MOD.obo.xml"));

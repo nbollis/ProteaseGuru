@@ -1,19 +1,19 @@
 ﻿using Engine;
-using Tasks;
 using OxyPlot;
 using OxyPlot.Axes;
+using OxyPlot.Legends;
 using OxyPlot.Series;
+using Proteomics;
 using Proteomics.ProteolyticDigestion;
 using Proteomics.RetentionTimePrediction;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
-using System.Linq;
 using System.Globalization;
-using Proteomics;
-//using Easy.Common.Extensions;
+using System.Linq;
 using System.Windows;
+using Tasks;
 
 namespace GUI
 {
@@ -66,12 +66,12 @@ namespace GUI
             }
         }
 
-        public PlotModelStat(string plotName, List<string> dbSelected, Dictionary<string, Dictionary<string, Dictionary<Protein, List<InSilicoPep>>>> peptideByFile, Parameters userParams, Dictionary<string, Dictionary<Protein, (double,double)>> sequenceCoverageByProtease)
+        public PlotModelStat(string plotName, List<string> dbSelected, Dictionary<string, Dictionary<string, Dictionary<Protein, List<InSilicoPep>>>> peptideByFile, Parameters userParams, Dictionary<string, Dictionary<Protein, (double, double)>> sequenceCoverageByProtease)
         {
             privateModel = new PlotModel { Title = plotName, DefaultFontSize = 12 };
 
             Dictionary<string, Dictionary<Protein, List<InSilicoPep>>> databasePeptides = new Dictionary<string, Dictionary<Protein, List<InSilicoPep>>>();
-            
+
             if (dbSelected.Count() > 1)
             {
                 MessageBox.Show("Note: More than one protein database has been selected. Unique peptides are defined as being unique to a single protein in all selected databases.");
@@ -102,7 +102,7 @@ namespace GUI
                     {
                         peptidesToProteins = allPeptides.GroupBy(p => p.BaseSequence).ToDictionary(group => group.Key, group => group.ToList());
                     }
-                    var unique = peptidesToProteins.Where(p => p.Value.Select(p => p.Protein).Distinct().Count() == 1 && p.Value.Select(p=>p.Database).Distinct().Count() ==1 ).ToDictionary(group => group.Key, group => group.Value);
+                    var unique = peptidesToProteins.Where(p => p.Value.Select(p => p.Protein).Distinct().Count() == 1 && p.Value.Select(p => p.Database).Distinct().Count() == 1).ToDictionary(group => group.Key, group => group.Value);
                     var shared = peptidesToProteins.Where(p => p.Value.Select(p => p.Protein).Distinct().Count() > 1).ToDictionary(group => group.Key, group => group.Value);
 
                     foreach (var db in dbSelected)
@@ -224,8 +224,8 @@ namespace GUI
                     }
                     SequenceCoverageByProtease_Return = CalculateProteinSequenceCoverage(databasePeptides);
                 }
-                else 
-                {                    
+                else
+                {
                     foreach (var db in dbSelected)
                     {
                         var pep = peptideByFile[db];
@@ -241,7 +241,7 @@ namespace GUI
                                         databasePeptides[entry.Key][prot.Key].AddRange(prot.Value);
                                     }
                                     else
-                                    {                                       
+                                    {
                                         databasePeptides[entry.Key].Add(prot.Key, prot.Value);
                                     }
                                 }
@@ -251,7 +251,7 @@ namespace GUI
                                 Dictionary<Protein, List<InSilicoPep>> proteinDic = new Dictionary<Protein, List<InSilicoPep>>();
                                 foreach (var prot in entry.Value)
                                 {
-                                    List<InSilicoPep> proteinSpecificPeptides = new List<InSilicoPep>();                                    
+                                    List<InSilicoPep> proteinSpecificPeptides = new List<InSilicoPep>();
                                     proteinDic.Add(prot.Key, prot.Value);
                                 }
                                 databasePeptides.Add(entry.Key, proteinDic);
@@ -353,16 +353,17 @@ namespace GUI
         }
         // returns a bin index of number relative to 0, midpoints are rounded towards zero
         private static int roundToBin(double number, double binSize)
-        {                 
+        {
             int sign = number < 0 ? -1 : 1;
             double d = number * sign;
             double remainder = (d / binSize) - Math.Floor(d / binSize);
-            int i = remainder != 0 ? (int)(Math.Ceiling(d / binSize)) : (int)(d / binSize);            
+            int i = remainder != 0 ? (int)(Math.Ceiling(d / binSize)) : (int)(d / binSize);
             return i * sign;
         }
 
-        // used by histogram plots, gives additional properies for the tracker to display
-        private class HistItem : ColumnItem
+        // used by histogram plots, gives additional properties for the tracker to display
+        // OxyPlot 2.2: ColumnItem renamed to BarItem in OxyPlot.Series
+        private class HistItem : OxyPlot.Series.BarItem
         {
             public int total { get; set; }
             public string bin { get; set; }
@@ -373,26 +374,32 @@ namespace GUI
             }
         }
 
-        private class BarItem : ColumnItem
+        private class CustomBarItem : OxyPlot.Series.BarItem
         {
             public int total { get; set; }
             public string label { get; set; }
-            public BarItem(double value, int categoryIndex, string label, int total) : base(value, categoryIndex)
+            public CustomBarItem(double value, int categoryIndex, string label, int total) : base(value, categoryIndex)
             {
                 this.total = total;
                 this.label = label;
             }
         }
 
+        // Replace the columnPlot() method with this:
         private void columnPlot()
         {
-            privateModel.LegendTitle = "Protease";
-            privateModel.LegendPlacement = LegendPlacement.Outside;
-            privateModel.LegendPosition = LegendPosition.BottomLeft;
-            privateModel.LegendItemAlignment = OxyPlot.HorizontalAlignment.Left;
-            privateModel.LegendFontSize = 12;
+            // OxyPlot 2.2: Legend properties moved to separate Legend object
+            var legend = new Legend
+            {
+                LegendTitle = "Protease",
+                LegendPlacement = LegendPlacement.Outside,
+                LegendPosition = LegendPosition.BottomLeft,
+                LegendItemAlignment = OxyPlot.HorizontalAlignment.Left,
+                LegendFontSize = 12,
+                LegendOrientation = LegendOrientation.Horizontal
+            };
+            privateModel.Legends.Add(legend);
             privateModel.TitleFontSize = 15;
-            privateModel.LegendOrientation = LegendOrientation.Horizontal;
 
             string yAxisTitle = "Count";
             string xAxisTitle = "Amino Acid";
@@ -423,25 +430,48 @@ namespace GUI
                 dictsByProtease.Add(protease.Key, aminoAcidCount);
             }
 
-            var categoryAxis = new CategoryAxis { Position = AxisPosition.Bottom, Title =xAxisTitle, GapWidth = .1 };
+            // OxyPlot 2.2: BarSeries requires explicit axis keys
+            var categoryAxis = new CategoryAxis
+            {
+                Position = AxisPosition.Left,
+                Title = xAxisTitle,
+                GapWidth = 0.1,
+                Key = "CategoryAxis"
+            };
             foreach (var aa in aminoAcids)
             {
                 categoryAxis.Labels.Add(aa.ToString());
             }
 
+            var valueAxis = new LinearAxis
+            {
+                Title = yAxisTitle,
+                Position = AxisPosition.Bottom,
+                AbsoluteMinimum = 0,
+                MinimumPadding = 0,
+                Key = "ValueAxis"
+            };
+
             // add axes
             privateModel.Axes.Add(categoryAxis);
-            privateModel.Axes.Add(new LinearAxis { Title = yAxisTitle, Position = AxisPosition.Left, AbsoluteMinimum = 0 });
-            privateModel.Axes[0].AbsoluteMaximum = privateModel.Axes[0].Maximum;            
+            privateModel.Axes.Add(valueAxis);
 
             foreach (string key in dictsByProtease.Keys)
             {
-                var columns = new ColumnSeries { ColumnWidth = 200, IsStacked = false, Title = key/*, TrackerFormatString = "Bin: {bin}\n{0}: {2}\nTotal: {total}" */};
+                // OxyPlot 2.2: Must set axis keys on BarSeries
+                var columns = new BarSeries
+                {
+                    BarWidth = 200,
+                    IsStacked = false,
+                    Title = key,
+                    XAxisKey = "ValueAxis",
+                    YAxisKey = "CategoryAxis"
+                };
 
                 foreach (var d in dictsByProtease[key])
                 {
-                    var column = new ColumnItem(d.Value);
-                    
+                    var column = new OxyPlot.Series.BarItem(d.Value);
+
                     columns.Items.Add(column);
                     if (DataTable.ContainsKey(d.Key.ToString()))
                     {
@@ -471,27 +501,32 @@ namespace GUI
 
                         DataTable.Add(d.Key.ToString(), data);
                     }
-
                 }
                 privateModel.Series.Add(columns);
-
             }
         }
+        // Replace the histogramPlot() method with this:
         private void histogramPlot(int plotType)
         {
-            privateModel.LegendTitle = "Protease";
-            privateModel.LegendPlacement = LegendPlacement.Outside;
-            privateModel.LegendPosition = LegendPosition.BottomLeft;
-            privateModel.LegendFontSize = 12;
+            // OxyPlot 2.2: Legend properties moved to separate Legend object
+            var legend = new Legend
+            {
+                LegendTitle = "Protease",
+                LegendPlacement = LegendPlacement.Outside,
+                LegendPosition = LegendPosition.BottomLeft,
+                LegendFontSize = 12,
+                LegendOrientation = LegendOrientation.Horizontal
+            };
+            privateModel.Legends.Add(legend);
             privateModel.TitleFontSize = 15;
-            privateModel.LegendOrientation = LegendOrientation.Horizontal;
+
             string yAxisTitle = "Count";
             string xAxisTitle = "";
             double binSize = -1;
             double labelAngle = 0;
             SortedList<double, double> numCategory = new SortedList<double, double>();
-            Dictionary<string, IEnumerable<double>> numbersByProtease = new Dictionary<string, IEnumerable<double>>();    // key is protease name, value is data from that protease
-            Dictionary<string, Dictionary<string, int>> dictsByProtease = new Dictionary<string, Dictionary<string, int>>();   // key is protease name, value is dictionary of bins and their counts
+            Dictionary<string, IEnumerable<double>> numbersByProtease = new Dictionary<string, IEnumerable<double>>();
+            Dictionary<string, Dictionary<string, int>> dictsByProtease = new Dictionary<string, Dictionary<string, int>>();
 
             switch (plotType)
             {
@@ -511,7 +546,7 @@ namespace GUI
                     foreach (string key in SequenceCoverageByProtease.Keys)
                     {
                         numbersByProtease.Add(key, SequenceCoverageByProtease[key].Select(p => p));
-                        var testList = numbersByProtease[key].Select(p => roundToBin(p, binSize)).ToList();                        
+                        var testList = numbersByProtease[key].Select(p => roundToBin(p, binSize)).ToList();
                         var results = numbersByProtease[key].GroupBy(p => roundToBin(p, binSize)).OrderBy(p => p.Key).Select(p => p).ToList();
                         dictsByProtease.Add(key, results.ToDictionary(p => p.Key.ToString(), v => v.Count()));
                     }
@@ -527,7 +562,7 @@ namespace GUI
                         dictsByProtease.Add(key, results.ToDictionary(p => p.Key.ToString(), v => v.Count()));
                     }
                     break;
-                case 4: // Predicted Peptide Hydrophobicity
+                case 4: // Number of Unique Peptides per Protein
                     xAxisTitle = "Number of Unique Peptides per Protein";
                     binSize = 10;
                     double maxValue = 0;
@@ -543,7 +578,7 @@ namespace GUI
                             minValue = UniquePeptidesPerProtein[key].Min();
                         }
                     }
-                    binSize = Math.Round((maxValue - minValue) / 50, 0);
+                    binSize = Math.Max(1, Math.Round((maxValue - minValue) / 50, 0));
 
                     foreach (string key in UniquePeptidesPerProtein.Keys)
                     {
@@ -571,23 +606,20 @@ namespace GUI
                         var results = numbersByProtease[key].GroupBy(p => roundToBin(p, binSize)).OrderBy(p => p.Key).Select(p => p);
                         dictsByProtease.Add(key, results.ToDictionary(p => p.Key.ToString(), v => v.Count()));
                     }
-                    break;               
+                    break;
             }
 
-            String[] category;  // for labeling bottom axis
-            int[] totalCounts;  // for having the tracker show total count across all files
-            
-            
+            String[] category;
+            int[] totalCounts;
+
             IEnumerable<double> allNumbers = numbersByProtease.Values.SelectMany(x => x);
 
-            
-            int end = roundToBin(allNumbers.Max(), binSize);  
-            int start = roundToBin(allNumbers.Min(), binSize);                        
+            int end = roundToBin(allNumbers.Max(), binSize);
+            int start = roundToBin(allNumbers.Min(), binSize);
             int numBins = end - start + 1;
-            int minBinLabels = 15;  // the number of labeled bins will be between minBinLabels and 2 * minBinLabels
+            int minBinLabels = 15;
             int skipBinLabel = numBins < minBinLabels ? 1 : numBins / minBinLabels;
 
-            // assign axis labels, skip labels based on skipBinLabel, calculate bin totals across all files
             var MaxValue = 0;
             category = new string[numBins];
             totalCounts = new int[numBins];
@@ -607,13 +639,42 @@ namespace GUI
                 }
             }
 
-            
-                // add a column series for each protease
+            // OxyPlot 2.2: BarSeries requires explicit axis keys
+            var categoryAxis = new CategoryAxis
+            {
+                Position = AxisPosition.Left,
+                ItemsSource = category,
+                Title = xAxisTitle,
+                GapWidth = 0.1,
+                Angle = labelAngle,
+                Key = "CategoryAxis"
+            };
+
+            var valueAxis = new LinearAxis
+            {
+                Title = yAxisTitle,
+                Position = AxisPosition.Bottom,
+                AbsoluteMinimum = 0,
+                Minimum = 0,
+                Key = "ValueAxis"
+            };
+
+            privateModel.Axes.Add(categoryAxis);
+            privateModel.Axes.Add(valueAxis);
+
             foreach (string key in dictsByProtease.Keys)
             {
-                var column = new ColumnSeries { ColumnWidth = 200, IsStacked = false, Title = key, TrackerFormatString = "Bin: {bin}\n{0}: {2}\nTotal: {total}" };
+                var column = new BarSeries
+                {
+                    BarWidth = 200,
+                    IsStacked = false,
+                    Title = key,
+                    TrackerFormatString = "Bin: {bin}\n{0}: {2}\nTotal: {total}",
+                    XAxisKey = "ValueAxis",
+                    YAxisKey = "CategoryAxis"
+                };
                 foreach (var d in dictsByProtease[key])
-                {                    
+                {
                     int bin = int.Parse(d.Key);
                     var hist = new HistItem(d.Value, bin - start, (bin * binSize).ToString(CultureInfo.InvariantCulture), totalCounts[bin - start]);
                     column.Items.Add(hist);
@@ -626,7 +687,7 @@ namespace GUI
                         else
                         {
                             DataTable[hist.bin].Add(key, hist.Value.ToString());
-                        }                        
+                        }
                     }
                     else
                     {
@@ -642,34 +703,16 @@ namespace GUI
                                 data.Add(protease, "0");
                             }
                         }
-                        
+
                         DataTable.Add(hist.bin, data);
-                    }                   
-                   
-                }                
+                    }
+                }
                 privateModel.Series.Add(column);
-
-            }            
-
-            // add axes
-            privateModel.Axes.Add(new CategoryAxis
-            {
-                Position = AxisPosition.Bottom,
-                ItemsSource = category,
-                Title = xAxisTitle,
-                GapWidth = .1,
-                Angle = labelAngle,
-            });
-            privateModel.Axes.Add(new LinearAxis { Title = yAxisTitle, Position = AxisPosition.Left});
-            privateModel.Axes[0].AbsoluteMaximum = privateModel.Axes[0].Maximum;
-            privateModel.Axes[0].AbsoluteMinimum = privateModel.Axes[0].Minimum;
-            privateModel.Axes[1].AbsoluteMaximum = MaxValue;
-            privateModel.Axes[1].AbsoluteMinimum = 0;
-            privateModel.Axes[1].Minimum = 0;
+            }
         }
 
-        //calculate the protein seqeunce coverage of each protein based on its digested peptides (for all peptides and unique peptides)
-        private Dictionary<string, Dictionary<Protein, (double, double)>> CalculateProteinSequenceCoverage(Dictionary<string, Dictionary<Protein, List<InSilicoPep>>> peptidesByProtease )
+        //calculate the protein sequence coverage of each protein based on its digested peptides (for all peptides and unique peptides)
+        private Dictionary<string, Dictionary<Protein, (double, double)>> CalculateProteinSequenceCoverage(Dictionary<string, Dictionary<Protein, List<InSilicoPep>>> peptidesByProtease)
         {
             Dictionary<string, Dictionary<Protein, (double, double)>> proteinSequenceCoverageByProtease = new Dictionary<string, Dictionary<Protein, (double, double)>>();
             foreach (var protease in peptidesByProtease)
@@ -705,12 +748,11 @@ namespace GUI
             }
 
             return proteinSequenceCoverageByProtease;
-        }       
+        }
 
-        //unused interface methods
+        // IPlotModel interface methods - OxyPlot 2.2 changed Render signature
         public void Update(bool updateData) { }
-        public void Render(IRenderContext rc, double width, double height) { }
+        public void Render(IRenderContext rc, OxyRect rect) { }
         public void AttachPlotView(IPlotView plotView) { }
     }
-
 }
