@@ -1,4 +1,4 @@
-﻿<Window x:Class="GUI.MainWindow"
+<Window x:Class="GUI.MainWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
@@ -423,7 +423,7 @@
                                     </TextBox>
                                 </StackPanel>
                                 <StackPanel Orientation="Horizontal" Margin="5 5 5 0" Grid.Column="0" Grid.Row="4" Background="{StaticResource DataGridBackgroundColor}">
-                                    <CheckBox x:Name="ModPepsAreUnique" Content="Treat modified peptides as different peptides" IsEnabled="{Binding IsChecked, ElementName=CheckBoxParsimony}">
+                                    <CheckBox x:Name="ModPepsAreUnique" Content="Treat modified peptides as different peptides">
                                         <ToolTipService.ToolTip>
                                             <ToolTip Content="Modified forms of a peptide base sequence are treated as different"  ToolTipService.ShowDuration="999999" ToolTipService.InitialShowDelay="500" />
                                         </ToolTipService.ToolTip>
@@ -471,14 +471,14 @@
                                     </TextBox>
                                 </StackPanel>
                                 <StackPanel Orientation="Horizontal" Margin="5 5 5 0" Grid.Column="1" Grid.Row="3" Background="{StaticResource DataGridBackgroundColor}">
-                                    <CheckBox x:Name="FixedCarbamido" Content="Apply Fixed Carbamidomethylation of C" IsEnabled="{Binding IsChecked, ElementName=CheckBoxParsimony}">
+                                    <CheckBox x:Name="FixedCarbamido" Content="Apply Fixed Carbamidomethylation of C">
                                         <ToolTipService.ToolTip>
                                             <ToolTip Content="All Cysteines will be treated as if they were carbamidomathylated"  ToolTipService.ShowDuration="999999" ToolTipService.InitialShowDelay="500" />
                                         </ToolTipService.ToolTip>
                                     </CheckBox>
                                 </StackPanel>
                                 <StackPanel Orientation="Horizontal" Margin="5 5 5 0" Grid.Column="1" Grid.Row="4" Background="{StaticResource DataGridBackgroundColor}">
-                                    <CheckBox x:Name="VariableOx" Content="Apply Variable Oxidation of M" IsEnabled="{Binding IsChecked, ElementName=CheckBoxParsimony}">
+                                    <CheckBox x:Name="VariableOx" Content="Apply Variable Oxidation of M">
                                         <ToolTipService.ToolTip>
                                             <ToolTip Content="All Methionines will be treated as oxidized and un-oxidized generating two peptides will differeing base sequences"  ToolTipService.ShowDuration="999999" ToolTipService.InitialShowDelay="500" />
                                         </ToolTipService.ToolTip>
