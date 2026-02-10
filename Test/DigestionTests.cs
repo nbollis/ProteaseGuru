@@ -7,6 +7,7 @@ using System.IO;
 using System.Linq;
 using Tasks;
 using UsefulProteomicsDatabases;
+using Omics.Digestion;
 
 namespace Test
 {
@@ -83,12 +84,16 @@ namespace Test
                 DbForDigestion database = new DbForDigestion(databasePath);
 
                 Parameters param = new Parameters();
-                param.MinPeptideLengthAllowed = 1;
-                param.MaxPeptideLengthAllowed = 100;
-                param.NumberOfMissedCleavagesAllowed = 0;
                 param.TreatModifiedPeptidesAsDifferent = false;
-                param.ProteasesForDigestion.Add(ProteaseDictionary.Dictionary["trypsin (cleave before proline)"]);
                 param.OutputFolder = subFolder;
+
+                DigestionParams trypsin = new DigestionParams(
+                    protease: "trypsin (cleave before proline)",
+                    maxMissedCleavages: 0,
+                    minPeptideLength: 1,
+                    maxPeptideLength: 100);
+
+                param.ProteaseSpecificParameters.Add(new ProteaseSpecificParameters(trypsin));
 
                 DigestionTask digestion = new DigestionTask();
                 digestion.DigestionParameters = param;
@@ -96,9 +101,9 @@ namespace Test
 
                 Assert.That(digestionResults.PeptideByFile.Count, Is.EqualTo(1));
                 Assert.That(digestionResults.PeptideByFile.Values.Count, Is.EqualTo(1));
-                Assert.That(digestionResults.PeptideByFile[database.FileName][param.ProteasesForDigestion.First().Name].Count, Is.EqualTo(2));
+                Assert.That(digestionResults.PeptideByFile[database.FileName][param.ProteaseSpecificParameters.First().DigestionAgentName].Count, Is.EqualTo(2));
 
-                foreach (var entry in digestionResults.PeptideByFile[database.FileName][param.ProteasesForDigestion.First().Name])
+                foreach (var entry in digestionResults.PeptideByFile[database.FileName][param.ProteaseSpecificParameters.First().DigestionAgentName])
                 {
                     var peptides = entry.Value;
 
@@ -154,12 +159,16 @@ namespace Test
                 DbForDigestion database3 = new DbForDigestion(databasePath3);
 
                 Parameters param = new Parameters();
-                param.MinPeptideLengthAllowed = 1;
-                param.MaxPeptideLengthAllowed = 100;
-                param.NumberOfMissedCleavagesAllowed = 0;
                 param.TreatModifiedPeptidesAsDifferent = false;
-                param.ProteasesForDigestion.Add(ProteaseDictionary.Dictionary["trypsin (cleave before proline)"]);
                 param.OutputFolder = subFolder;
+
+                DigestionParams trypsin = new DigestionParams(
+                    protease: "trypsin (cleave before proline)",
+                    maxMissedCleavages: 0,
+                    minPeptideLength: 1,
+                    maxPeptideLength: 100);
+
+                param.ProteaseSpecificParameters.Add(new ProteaseSpecificParameters(trypsin));
 
                 DigestionTask digestion = new DigestionTask();
                 digestion.DigestionParameters = param;
@@ -167,9 +176,9 @@ namespace Test
 
                 Assert.That(digestionResults.PeptideByFile.Count, Is.EqualTo(3));
                 Assert.That(digestionResults.PeptideByFile.Values.Count, Is.EqualTo(3));
-                Assert.That(digestionResults.PeptideByFile[database1.FileName][param.ProteasesForDigestion.First().Name].Count, Is.EqualTo(2));
-                Assert.That(digestionResults.PeptideByFile[database2.FileName][param.ProteasesForDigestion.First().Name].Count, Is.EqualTo(2));
-                Assert.That(digestionResults.PeptideByFile[database3.FileName][param.ProteasesForDigestion.First().Name].Count, Is.EqualTo(2));
+                Assert.That(digestionResults.PeptideByFile[database1.FileName][param.ProteaseSpecificParameters.First().DigestionAgentName].Count, Is.EqualTo(2));
+                Assert.That(digestionResults.PeptideByFile[database2.FileName][param.ProteaseSpecificParameters.First().DigestionAgentName].Count, Is.EqualTo(2));
+                Assert.That(digestionResults.PeptideByFile[database3.FileName][param.ProteaseSpecificParameters.First().DigestionAgentName].Count, Is.EqualTo(2));
 
                 // Database 1 assertions (abbreviated - keep your existing assertions)
                 // Database 2 assertions
@@ -195,18 +204,22 @@ namespace Test
                 var protDic = ProteaseDictionary.LoadProteaseDictionary(Path.Combine(GlobalVariables.DataDir, @"ProteolyticDigestion", @"proteases.tsv"), GlobalVariables.ProteaseMods);
 
                 Parameters param = new Parameters();
-                param.MinPeptideLengthAllowed = 1;
-                param.MaxPeptideLengthAllowed = 100;
-                param.NumberOfMissedCleavagesAllowed = 0;
                 param.TreatModifiedPeptidesAsDifferent = false;
-                param.ProteasesForDigestion.Add(protDic["CNBr"]);
                 param.OutputFolder = subFolder;
+
+                DigestionParams cnbrDigestion = new DigestionParams(
+                    protease: "CNBr",
+                    maxMissedCleavages: 0,
+                    minPeptideLength: 1,
+                    maxPeptideLength: 100);
+
+                param.ProteaseSpecificParameters.Add(new ProteaseSpecificParameters(cnbrDigestion));
 
                 DigestionTask digestion = new DigestionTask();
                 digestion.DigestionParameters = param;
                 var digestionResults = digestion.RunSpecific(subFolder, new List<DbForDigestion>() { database1 });
 
-                foreach (var entry in digestionResults.PeptideByFile[database1.FileName][param.ProteasesForDigestion.First().Name])
+                foreach (var entry in digestionResults.PeptideByFile[database1.FileName][param.ProteaseSpecificParameters.First().DigestionAgentName])
                 {
                     var peptides = entry.Value;
                     Assert.That(peptides.Count, Is.EqualTo(2));
@@ -241,12 +254,16 @@ namespace Test
                 DbForDigestion database3 = new DbForDigestion(databasePath3);
 
                 Parameters param = new Parameters();
-                param.MinPeptideLengthAllowed = 1;
-                param.MaxPeptideLengthAllowed = 100;
-                param.NumberOfMissedCleavagesAllowed = 0;
                 param.TreatModifiedPeptidesAsDifferent = false;
-                param.ProteasesForDigestion.Add(ProteaseDictionary.Dictionary["trypsin (cleave before proline)"]);
                 param.OutputFolder = subFolder;
+
+                DigestionParams trypsin = new DigestionParams(
+                    protease: "trypsin (cleave before proline)",
+                    maxMissedCleavages: 0,
+                    minPeptideLength: 1,
+                    maxPeptideLength: 100);
+
+                param.ProteaseSpecificParameters.Add(new ProteaseSpecificParameters(trypsin));
 
                 DigestionTask digestion = new DigestionTask();
                 digestion.DigestionParameters = param;

@@ -3,6 +3,7 @@ using System.Data;
 using Chromatography.RetentionTimePrediction;
 using Chromatography.RetentionTimePrediction.Chronologer;
 using Engine;
+using Omics;
 using Omics.Modifications;
 using Proteomics;
 using Proteomics.ProteolyticDigestion;
@@ -52,7 +53,7 @@ namespace Tasks
                 List<Protein> proteinsForDigestion = proteins;
 
                 // Process each protease in parallel for this database
-                Parallel.ForEach(DigestionParameters.ProteasesForDigestion, protease =>
+                Parallel.ForEach(DigestionParameters.ProteaseSpecificParameters, protease =>
                 {
                     Status("Digesting Proteins...", "digestDbs");
 
@@ -60,7 +61,7 @@ namespace Tasks
                     var peptidesFormatted = DeterminePeptideStatus(databaseFileName, peptides, DigestionParameters);
 
                     // Thread-safe add to the concurrent dictionary
-                    proteaseResults[protease.Name] = peptidesFormatted;
+                    proteaseResults[protease.DigestionAgentName] = peptidesFormatted;
                 });
             });
 
@@ -135,7 +136,7 @@ namespace Tasks
         /// <returns>Dictionary mapping proteins to their processed InSilicoPep objects</returns>
         Dictionary<Protein, List<InSilicoPep>> DeterminePeptideStatus(
             string databaseName, 
-            Dictionary<Protein, List<PeptideWithSetModifications>> databasePeptides, 
+            Dictionary<Protein, List<IBioPolymerWithSetMods>> databasePeptides, 
             Parameters userParams)
         {
             // ============================================================================
@@ -143,35 +144,44 @@ namespace Tasks
             // ============================================================================
     
             // Flatten all peptides to determine which sequences are unique vs shared
-            var allPeptides = databasePeptides
+            var allWithSetMods = databasePeptides
                 .SelectMany(kvp => kvp.Value)
                 .ToList();
 
             // Group by sequence to determine uniqueness
             var peptideGroups = userParams.TreatModifiedPeptidesAsDifferent
-                ? allPeptides.GroupBy(p => p.FullSequence)
-                : allPeptides.GroupBy(p => p.BaseSequence);
+                ? allWithSetMods.GroupBy(p => p.FullSequence)
+                : allWithSetMods.GroupBy(p => p.BaseSequence);
 
             // Build lookup: sequence -> isUnique (maps to exactly one protein)
             var uniquenessLookup = peptideGroups.ToDictionary(
                 group => group.Key,
-                group => group.Select(p => p.Protein).Distinct().Count() == 1
+                group => group.Select(p => p.Parent).Distinct().Count() == 1
             );
 
             // ============================================================================
             // PHASE 2: Batch calculate hydrophobicity and electrophoretic mobility
             // ============================================================================
-    
-            var hydrophobicityValues = BatchCalculateHydrophobicity(allPeptides);
-            var mobilityValues = BatchCalculateElectrophoreticMobility(allPeptides);
-            var retentionTimesChronologer = BatchCalculateRetentionTimesChronologer(allPeptides);
+
+            var allPeptides = allWithSetMods.Where(p => p is PeptideWithSetModifications).Cast<PeptideWithSetModifications>().ToList();
+
+            double[] hydrophobicityValues = new double[allPeptides.Count];
+            double[] mobilityValues = new double[allPeptides.Count];
+            double[] retentionTimesChronologer = new double[allPeptides.Count];
+
+            if (allPeptides.Count == allWithSetMods.Count)
+            {
+                hydrophobicityValues = BatchCalculateHydrophobicity(allPeptides);
+                mobilityValues = BatchCalculateElectrophoreticMobility(allPeptides);
+                retentionTimesChronologer = BatchCalculateRetentionTimesChronologer(allPeptides);
+            }
 
             // Create a lookup from peptide to its calculated values
-            var peptideToIndex = new Dictionary<PeptideWithSetModifications, int>();
+            var peptideToIndex = new Dictionary<IBioPolymerWithSetMods, int>();
 
-            for (int i = 0; i < allPeptides.Count; i++)
+            for (int i = 0; i < allWithSetMods.Count; i++)
             {
-                peptideToIndex[allPeptides[i]] = i;
+                peptideToIndex[allWithSetMods[i]] = i;
             }
 
             // ============================================================================
@@ -202,8 +212,8 @@ namespace Tasks
                     var inSilicoPep = new InSilicoPep(
                         peptide.BaseSequence,
                         peptide.FullSequence,
-                        peptide.PreviousAminoAcid,
-                        peptide.NextAminoAcid,
+                        peptide.PreviousResidue,
+                        peptide.NextResidue,
                         isUnique,
                         hydrophobicityValues[index],
                         mobilityValues[index],
@@ -211,10 +221,10 @@ namespace Tasks
                         peptide.Length,
                         peptide.MonoisotopicMass,
                         databaseName,
-                        peptide.Protein.Accession,
-                        peptide.Protein.Name,
-                        peptide.OneBasedStartResidueInProtein,
-                        peptide.OneBasedEndResidueInProtein,
+                        peptide.Parent.Accession,
+                        peptide.Parent.Name,
+                        peptide.OneBasedStartResidue,
+                        peptide.OneBasedEndResidue,
                         peptide.DigestionParams.DigestionAgent.Name
                     );
 
@@ -656,18 +666,73 @@ namespace Tasks
                 }
 
             List<string> parameters = new List<string>();
+
+            // write shared parameters for all digestions to a text file in the output folder
             parameters.Add("Digestion Conditions:");
             parameters.Add("Database: " + string.Join(',', peptideByFile.Keys));
-            parameters.Add("Proteases: " + string.Join(',', userParams.ProteasesForDigestion.Select(p => p.Name).ToList()));
-            parameters.Add("Max Missed Cleavages: " + userParams.NumberOfMissedCleavagesAllowed);
-            parameters.Add("Min Peptide Length: " + userParams.MinPeptideLengthAllowed);
-            parameters.Add("Max Peptide Length: " + userParams.MaxPeptideLengthAllowed);
             parameters.Add("Treat modified peptides as different peptides: " + userParams.TreatModifiedPeptidesAsDifferent);
-            parameters.Add("Min Peptide Mass: " + userParams.MinPeptideLengthAllowed);
-            parameters.Add("Max Peptide Mass: " + userParams.MaxPeptideLengthAllowed);
+            parameters.Add("Min Peptide Mass: " + userParams.MinPeptideMassAllowed);
+            parameters.Add("Max Peptide Mass: " + userParams.MaxPeptideMassAllowed);
 
-            File.WriteAllLines(filePath + @"\DigestionConditions.txt", parameters);
-            
+            // Extract Values from each digestion parameter
+            List<string>? proteases = [];
+            List<int>? missedCleavages = [];
+            List<int>? minLength = [];
+            List<int>? maxLength = [];
+
+            foreach (var specific in userParams.ProteaseSpecificParameters)
+            {
+                proteases.Add(specific.DigestionAgentName);
+                missedCleavages.Add(specific.DigestionParams.MaxMissedCleavages);
+                minLength.Add(specific.DigestionParams.MinLength);
+                maxLength.Add(specific.DigestionParams.MaxLength);
+            }
+
+            // If all share the same value, add that to the shared section
+            if (missedCleavages.Distinct().Count() == 1)
+            {
+                parameters.Add("Missed Cleavages: " + missedCleavages.First());
+                missedCleavages = null;
+            }
+
+            if (minLength.Distinct().Count() == 1)
+            {
+                parameters.Add("Min Peptide Length: " + minLength.First());
+                minLength = null;
+            }
+
+            if (maxLength.Distinct().Count() == 1)
+            {
+                parameters.Add("Max Peptide Length: " + maxLength.First());
+                maxLength = null;
+            }
+
+            if (missedCleavages is null && minLength is null && maxLength is null)
+            {
+                parameters.Add("Proteases: " + string.Join(", ", proteases));
+            }
+            else
+            {
+                for (int i = 0; i < userParams.ProteaseSpecificParameters.Count; i++)
+                {
+                    List<string> specificParams = new List<string>();
+                    if (missedCleavages is not null)
+                    {
+                        specificParams.Add("Missed Cleavages: " + missedCleavages[i]);
+                    }
+                    if (minLength is not null)
+                    {
+                        specificParams.Add("Min Peptide Length: " + minLength[i]);
+                    }
+                    if (maxLength is not null)
+                    {
+                        specificParams.Add("Max Peptide Length: " + maxLength[i]);
+                    }
+                    parameters.Add(proteases[i] + ": " + string.Join("\n\t", specificParams));
+                }
+            }
+
+            File.WriteAllLines(filePath + @"\DigestionConditions.txt", parameters);            
         }
 
         protected void Status(string v, string id)
@@ -676,26 +741,24 @@ namespace Tasks
         }
 
         //digest proteins for each database using the protease and settings provided
-        protected Dictionary<Protein, List<PeptideWithSetModifications>> DigestDatabase(List<Protein> proteinsFromDatabase,
-            Protease protease, Parameters userDigestionParams)
-        {           
-            DigestionParams dp = new DigestionParams(protease: protease.Name, maxMissedCleavages: userDigestionParams.NumberOfMissedCleavagesAllowed,
-                minPeptideLength: userDigestionParams.MinPeptideLengthAllowed, maxPeptideLength: userDigestionParams.MaxPeptideLengthAllowed);            
-            Dictionary<Protein, List<PeptideWithSetModifications>> peptidesForProtein = new Dictionary<Protein, List<PeptideWithSetModifications>>(proteinsFromDatabase.Count);
+        protected Dictionary<Protein, List<IBioPolymerWithSetMods>> DigestDatabase(List<Protein> proteinsFromDatabase,
+            ProteaseSpecificParameters proteaseSpecificParameters, Parameters globalDigestionParams)
+        {                     
+            Dictionary<Protein, List<IBioPolymerWithSetMods>> peptidesForProtein = new (proteinsFromDatabase.Count);
             foreach (var protein in proteinsFromDatabase)
             {
-                List<PeptideWithSetModifications> peptides = protein.Digest(dp, userDigestionParams.fixedMods, userDigestionParams.variableMods).ToList();
-                if (userDigestionParams.MaxPeptideMassAllowed != -1 && userDigestionParams.MinPeptideMassAllowed != -1)
+                List<IBioPolymerWithSetMods> peptides = protein.Digest(proteaseSpecificParameters.DigestionParams, proteaseSpecificParameters.FixedMods, proteaseSpecificParameters.VariableMods).ToList();
+                if (globalDigestionParams.MaxPeptideMassAllowed != -1 && globalDigestionParams.MinPeptideMassAllowed != -1)
                 {
-                    peptides = peptides.Where(p => p.MonoisotopicMass > userDigestionParams.MinPeptideMassAllowed && p.MonoisotopicMass < userDigestionParams.MaxPeptideMassAllowed).ToList();
+                    peptides = peptides.Where(p => p.MonoisotopicMass > globalDigestionParams.MinPeptideMassAllowed && p.MonoisotopicMass < globalDigestionParams.MaxPeptideMassAllowed).ToList();
                 }
-                else if (userDigestionParams.MaxPeptideMassAllowed == -1 && userDigestionParams.MinPeptideMassAllowed != -1)
+                else if (globalDigestionParams.MaxPeptideMassAllowed == -1 && globalDigestionParams.MinPeptideMassAllowed != -1)
                 {
-                    peptides = peptides.Where(p => p.MonoisotopicMass > userDigestionParams.MinPeptideMassAllowed).ToList();
+                    peptides = peptides.Where(p => p.MonoisotopicMass > globalDigestionParams.MinPeptideMassAllowed).ToList();
                 }
-                else if (userDigestionParams.MaxPeptideMassAllowed != -1 && userDigestionParams.MinPeptideMassAllowed == -1)
+                else if (globalDigestionParams.MaxPeptideMassAllowed != -1 && globalDigestionParams.MinPeptideMassAllowed == -1)
                 {
-                    peptides = peptides.Where(p => p.MonoisotopicMass < userDigestionParams.MaxPeptideMassAllowed).ToList();
+                    peptides = peptides.Where(p => p.MonoisotopicMass < globalDigestionParams.MaxPeptideMassAllowed).ToList();
                 }                
                 peptidesForProtein.Add(protein, peptides);
             }
