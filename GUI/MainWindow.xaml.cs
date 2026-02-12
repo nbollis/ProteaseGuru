@@ -34,10 +34,10 @@ namespace GUI
     /// </summary>
     public partial class MainWindow : Window
     {
-        private readonly ObservableCollection<ProteinDbForDataGrid> ProteinDbObservableCollection = new ();
-        private readonly ObservableCollection<ProteinDbForDataGrid> ReloadProteinDbObservableCollection = new ();
-        private readonly ObservableCollection<ResultsForDataGrid> ResultsObservableCollection = new ();
-        private readonly ObservableCollection<ParametersForDataGrid> ParametersObservableCollection = new();
+        private readonly ObservableCollection<ProteinDbForDataGrid> ProteinDbObservableCollection = new ObservableCollection<ProteinDbForDataGrid>();
+        private readonly ObservableCollection<ProteinDbForDataGrid> ReloadProteinDbObservableCollection = new ObservableCollection<ProteinDbForDataGrid>();
+        private readonly ObservableCollection<ResultsForDataGrid> ResultsObservableCollection = new ObservableCollection<ResultsForDataGrid>();
+        private readonly ObservableCollection<ParametersForDataGrid> ParametersObservableCollection = new ObservableCollection<ParametersForDataGrid>();
         private readonly ObservableCollection<RunSummaryForTreeView> SummaryForTreeViewObservableCollection;
 
         private readonly DigestionConditionsSetupViewModel ParametersViewModel;
