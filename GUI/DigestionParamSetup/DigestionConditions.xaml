@@ -174,9 +174,10 @@
         <!-- Main Content - Right Side -->
         <Grid Grid.Column="2" Grid.Row="1" Margin="4 2"
               Background="{StaticResource DataGridBackgroundColor}">
-            <StackPanel
+            <DockPanel
                 Background="{StaticResource DataGridBackgroundColor}">
                 <GroupBox Header="Apply To All Proteases"
+                          DockPanel.Dock="Top"
                           BorderThickness="2"
                           Foreground="{StaticResource TextColor1}"
                           BorderBrush="{StaticResource BorderColor}">
@@ -239,6 +240,7 @@
                 </GroupBox>
                 <GroupBox Header="Global Parameters" 
                           BorderThickness="2"
+                          DockPanel.Dock="Top"
                           Foreground="{StaticResource TextColor1}"
                           BorderBrush="{StaticResource BorderColor}">
                     <Grid Background="{StaticResource DataGridBackgroundColor}">
@@ -285,7 +287,7 @@
                                 </ToolTipService.ToolTip>
                             </CheckBox>
                         </StackPanel>
-                        
+
                         <!-- Min peptide mass -->
                         <StackPanel Orientation="Horizontal" Margin="5 5 5 0" Grid.Row="3"
                                 Background="{StaticResource DataGridBackgroundColor}">
@@ -317,24 +319,12 @@
                         </StackPanel>
                     </Grid>
                 </GroupBox>
-            </StackPanel>
-        </Grid>
 
-        
-        <Grid Grid.Row="2" Grid.ColumnSpan="3"  Style="{StaticResource InternalGridStyle}">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="*" />
-                <ColumnDefinition Width="2" />
-                <ColumnDefinition Width="*" />
-            </Grid.ColumnDefinitions>
-
-            <Button Grid.Column="0" x:Name="SaveDigestionTask" Content="Save Digestion Conditions"
-                    Click="SaveDigestionTask_Click"
-                    Width="300" HorizontalAlignment="Right"
-                    Style="{StaticResource ImportantButtonStyle}"/>
-            <Button Grid.Column="2" x:Name="ResetDigestionTask" Content="Reset Digestion Conditions"
-                    Command="{Binding ResetDigestionConditionsCommand}" Width="300" HorizontalAlignment="Left"
-                    Style="{StaticResource ImportantButtonStyle}"/>
+                <Button DockPanel.Dock="Bottom"  x:Name="ResetDigestionTask" Content="Reset Digestion Conditions" MinHeight="34" Margin=" 4 0"
+                        VerticalAlignment="Bottom" HorizontalAlignment="Center"
+                        Command="{Binding ResetDigestionConditionsCommand}"
+                        Style="{StaticResource ImportantButtonStyle}"/>
+            </DockPanel>
         </Grid>
     </Grid>
 </UserControl>
