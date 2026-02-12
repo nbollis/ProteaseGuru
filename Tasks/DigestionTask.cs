@@ -93,32 +93,33 @@ namespace Tasks
                     string databaseFileName = database.FileName;
                     List<Protein> proteinsForDigestion = proteins;
 
-                    // Process each protease in parallel for this database
-                    Parallel.ForEach(DigestionParameters.ProteaseSpecificParameters, protease =>
+                    // Process each protease sequentially within each database
+                    // (inner batch methods handle parallelism)
+                    foreach (var protease in DigestionParameters.ProteaseSpecificParameters)
                     {
                         Status("Digesting Proteins...", "digestDbs");
 
                         var peptides = DigestDatabase(proteinsForDigestion, protease, DigestionParameters);
                         var peptidesFormatted = DeterminePeptideStatus(databaseFileName, peptides, DigestionParameters);
 
-                        // Thread-safe add to the concurrent dictionary
                         proteaseResults[protease.DigestionAgentName] = peptidesFormatted;
-                    });
-
-                    // Convert concurrent dictionary back to regular dictionary
-                    foreach (var dbEntry in concurrentPeptideByFile)
-                    {
-                        PeptideByFile[dbEntry.Key] = new Dictionary<string, Dictionary<Protein, List<InSilicoPep>>>(dbEntry.Value);
                     }
+                });
 
-                    Status("Writing Peptide Output...", "peptides");
-                    WritePeptidesToTsv(PeptideByFile, OutputFolder, DigestionParameters);
-                    SequenceCoverageByProtease = CalculateProteinSequenceCoverage(PeptideByFile);
-                    MyTaskResults myRunResults = new MyTaskResults(this);
-                    Status("Writing Results Summary...", "summary");
-
-                    return myRunResults;
+                // Convert concurrent dictionary back to regular dictionary
+                foreach (var dbEntry in concurrentPeptideByFile)
+                {
+                    PeptideByFile[dbEntry.Key] = new Dictionary<string, Dictionary<Protein, List<InSilicoPep>>>(dbEntry.Value);
                 }
+
+                Status("Writing Peptide Output...", "peptides");
+                WritePeptidesToTsv(PeptideByFile, OutputFolder, DigestionParameters);
+                SequenceCoverageByProtease = CalculateProteinSequenceCoverage(PeptideByFile);
+                MyTaskResults myRunResults = new MyTaskResults(this);
+                Status("Writing Results Summary...", "summary");
+
+                return myRunResults;
+            }
             finally
             {
                 // Clean up predictor pool after run completes
