@@ -4,6 +4,8 @@ using Omics.Modifications.IO;
 using Proteomics.AminoAcidPolymer;
 using Proteomics.ProteolyticDigestion;
 using System.Diagnostics;
+using Omics.Modifications;
+using Omics.Modifications.IO;
 
 namespace Engine
 {

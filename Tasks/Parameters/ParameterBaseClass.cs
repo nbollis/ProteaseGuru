@@ -10,18 +10,14 @@ public abstract class ParameterBaseClass<TParameters> where TParameters : Parame
 {
     public static void ToToml(TParameters parameters, string filePath)
     {
-        Toml.WriteFile(parameters, filePath);
+        Toml.WriteFile(parameters, filePath, TomlConfig);
     }
 
-    public static TParameters FromToml(TParameters parameters, string filePath) 
+    public static TParameters FromToml(string filePath) 
     {
-        TParameters parametersFromFile = Toml.ReadFile<TParameters>(filePath);
-        foreach (var property in typeof(TParameters).GetProperties())
-        {
-            var value = property.GetValue(parametersFromFile);
-            property.SetValue(parameters, value);
-        }
-        return parameters;
+        TParameters parametersFromFile = Toml.ReadFile<TParameters>(filePath, TomlConfig);
+
+        return parametersFromFile;
     }
 
     public static readonly TomlSettings TomlConfig = TomlSettings.Create(cfg => cfg
@@ -46,9 +42,22 @@ public abstract class ParameterBaseClass<TParameters> where TParameters : Parame
             .WithConversionFor<TomlString>(convert => convert
                 .ToToml(custom => custom.ToString())
                 .FromToml(tmlString => ProteaseDictionary.Dictionary[tmlString.Value])))
-        //.ConfigureType<Modification>(type => type
-        //    .WithConversionFor<TomlString>(convert => convert
-        //        .ToToml(custom => custom.ToString())
-        //        .FromToml(tmlString => ModificationDictionary.Dictionary[tmlString.Value])))
+        .ConfigureType<Modification>(type => type
+            .WithConversionFor<TomlString>(convert => convert
+                .ToToml(mod => $"{mod.ModificationType}:{mod.IdWithMotif}")
+                .FromToml(tmlString => Mods.AllModsKnownDictionary.TryGetValue(tmlString.Value, out var mod) ? mod : null)))
+        .ConfigureType<List<Modification>>(type => type
+            .WithConversionFor<TomlString>(convert => convert
+                .ToToml(modList => string.Join(",", modList.Select(mod => $"{mod.IdWithMotif}")))
+                .FromToml(tmlString =>
+                    tmlString.Value.Split(',', StringSplitOptions.RemoveEmptyEntries)
+                        .Select(modStr => Mods.GetModification(modStr))
+                        .Where(mod => mod != null).Cast<Modification>()
+                        .ToList())))
+        .ConfigureType<List<ProteaseSpecificParameters>>(type => type
+            .WithConversionFor<TomlTableArray>(convert => convert
+                .FromToml(tmlTableArr => tmlTableArr.Items.Select(table => table.Get<ProteaseSpecificParameters>()).ToList())))
+        .ConfigureType<ProteaseSpecificParameters>(type => type
+            .IgnoreProperty(p => p.DigestionAgentName))
         );
 }

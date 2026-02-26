@@ -43,7 +43,7 @@ namespace Tasks
         public static event EventHandler<StringEventArgs>? DigestionWarnHandler;
         public static event EventHandler<StringEventArgs>? OutLabelStatusHandler;
 
-        public Parameters DigestionParameters { get; set; }
+        public RunParameters DigestionParameters { get; set; }
         public Dictionary<string, Dictionary<string, Dictionary<Protein, List<InSilicoPep>>>>? PeptideByFile;
         public static Dictionary<string, Dictionary<Protein, List<InSilicoPep>>>? AllPeptidesByProtease;
         public Dictionary<string, Dictionary<Protein, (double, double)>> SequenceCoverageByProtease = new();
@@ -54,7 +54,7 @@ namespace Tasks
 
         public DigestionTask() : base(MyTask.Digestion)
         {
-            DigestionParameters = new Parameters();
+            DigestionParameters = new RunParameters();
         }
 
         #endregion
@@ -192,7 +192,7 @@ namespace Tasks
         Dictionary<Protein, List<InSilicoPep>> DeterminePeptideStatus(
             string databaseName,
             Dictionary<Protein, List<IBioPolymerWithSetMods>> databasePeptides,
-            Parameters userParams)
+            RunParameters userParams)
         {
             // PHASE 1: Determine uniqueness for all peptide sequences
             // ============================================================================
@@ -576,7 +576,7 @@ namespace Tasks
         /// </summary>
         //digest proteins for each database using the protease and settings provided
         protected Dictionary<Protein, List<IBioPolymerWithSetMods>> DigestDatabase(List<Protein> proteinsFromDatabase,
-            ProteaseSpecificParameters proteaseSpecificParameters, Parameters globalDigestionParams)
+            ProteaseSpecificParameters proteaseSpecificParameters, RunParameters globalDigestionParams)
         {
             Dictionary<Protein, List<IBioPolymerWithSetMods>> peptidesForProtein = new(proteinsFromDatabase.Count);
             foreach (var protein in proteinsFromDatabase)
@@ -610,7 +610,7 @@ namespace Tasks
         protected static void WritePeptidesToTsv(
             Dictionary<string, Dictionary<string, Dictionary<Protein, List<InSilicoPep>>>> peptideByFile,
             string filePath,
-            Parameters userParams)
+            RunParameters userParams)
         {
             const string tab = "\t";
             string header = string.Join(tab,

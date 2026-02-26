@@ -49,7 +49,7 @@ namespace GUI
             Title = "ProteaseGuru: Version " + GlobalVariables.ProteaseGuruVersion;
 
             // TODO: Set up default parameters to check for
-            ParametersViewModel = new(new Parameters());
+            ParametersViewModel = new(new RunParameters());
             digestionConditionsControl.DataContext = ParametersViewModel;
           
             dataGridProteinDatabases.DataContext = ProteinDbObservableCollection;
@@ -584,7 +584,7 @@ namespace GUI
             Dictionary<string, Dictionary<string, Dictionary<Protein, List<InSilicoPep>>>> PeptidesByFileSetUp = new Dictionary<string, Dictionary<string, Dictionary<Protein, List<InSilicoPep>>>>();
             Dictionary<string, Dictionary<string, Dictionary<Protein, List<InSilicoPep>>>> PeptidesByFile = new Dictionary<string, Dictionary<string, Dictionary<Protein, List<InSilicoPep>>>>();
 
-            Parameters loadedParams = new Parameters();
+            RunParameters loadedParams = new RunParameters();
 
             string proteaseDirectory = System.IO.Path.Combine(GlobalVariables.DataDir, @"ProteolyticDigestion");
             string proteaseFilePath = System.IO.Path.Combine(proteaseDirectory, @"proteases.tsv");
