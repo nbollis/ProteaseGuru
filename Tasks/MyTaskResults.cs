@@ -1,10 +1,11 @@
-using Proteomics;
-using Proteomics.ProteolyticDigestion;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Text;
+using Omics;
+using Proteomics;
+using Proteomics.ProteolyticDigestion;
 
 namespace Tasks
 {
@@ -16,8 +17,8 @@ namespace Tasks
 
         private readonly StringBuilder TaskSummaryText = new StringBuilder();
         private readonly StringBuilder PsmPeptideProteinSummaryText = new StringBuilder();
-        public readonly Dictionary<string, Dictionary<string, Dictionary<Protein, List<InSilicoPep>>>> PeptideByFile;
-        public readonly Dictionary<string, Dictionary<Protein, (double, double)>> SequenceCoverageByProtease;
+        public readonly Dictionary<string, Dictionary<string, Dictionary<IBioPolymer, List<InSilicoPep>>>> PeptideByFile;
+        public readonly Dictionary<string, Dictionary<IBioPolymer, (double, double)>> SequenceCoverageByProtease;
         RunParameters parameters;
 
         internal MyTaskResults(ProteaseGuruTask s)
@@ -30,7 +31,7 @@ namespace Tasks
         }
 
         // results sumary for file output
-        private List<string> writeSummary(Dictionary<string, Dictionary<string, Dictionary<Protein, List<InSilicoPep>>>> peptideByFile)
+        private List<string> writeSummary(Dictionary<string, Dictionary<string, Dictionary<IBioPolymer, List<InSilicoPep>>>> peptideByFile)
         {
             List<string> summary = new List<string>();
             if (PeptideByFile.Count > 1)

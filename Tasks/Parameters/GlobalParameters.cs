@@ -15,6 +15,8 @@ public class GlobalParameters : ParameterBaseClass<GlobalParameters>, IEquatable
         return new GlobalParameters
         {
             IsRnaMode = this.IsRnaMode,
+            AskAboutModeSwitch = this.AskAboutModeSwitch,
+            CachedModeSwitchResult = this.CachedModeSwitchResult,
             DefaultParameters = this.DefaultParameters?.Clone()
         };
     }

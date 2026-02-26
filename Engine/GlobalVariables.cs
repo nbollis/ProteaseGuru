@@ -18,8 +18,9 @@ namespace Engine
         private static char[] _InvalidAminoAcids = new char[] { 'X', 'B', 'J', 'Z', ':', '|', ';', '[', ']', '{', '}', '(', ')', '+', '-' };
 
         // this affects output labels, etc. and can be changed to "Proteoform" for top-down searches
-        public static string AnalyteType = "Peptide";
+        public static AnalyteType AnalyteType;
 
+        public static string DecoyIdentifier = "DECOY";
         static GlobalVariables()
         {
             var version = typeof(GlobalVariables).Assembly.GetName().Version;

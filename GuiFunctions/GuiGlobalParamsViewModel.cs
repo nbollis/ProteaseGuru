@@ -67,6 +67,7 @@ public class GuiGlobalParamsViewModel : BaseViewModel
             }
 
             _current.IsRnaMode = value;
+            GlobalVariables.AnalyteType = _current.IsRnaMode ? AnalyteType.Oligo : AnalyteType.Peptide;
 
             OnPropertyChanged(nameof(IsRnaMode));
             OnPropertyChanged(nameof(MainWindowTitle));
