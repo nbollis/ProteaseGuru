@@ -86,7 +86,7 @@ namespace Tasks.CoverageMapConfiguration
         private void OrganizePeptideData()
         {
             // Use HashSet to avoid duplicate protein accessions
-            HashSet<string> proteinAccessionSet = new HashSet<string>();
+            HashSet<string> proteinAccessionSet = new();
 
             // Iterate through all databases, proteases, and proteins
             foreach (var db in PeptideByFile)

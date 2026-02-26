@@ -4,6 +4,7 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
+using Omics;
 using Omics.BioPolymer;
 using Omics.Modifications;
 using Proteomics;
@@ -42,13 +43,13 @@ namespace GUI
         /// <summary>
         /// Maps Protein objects to their tree view representation (GUI-specific)
         /// </summary>
-        private Dictionary<Protein, ProteinForTreeView> ProteinsForTreeView;
+        private Dictionary<IBioPolymer, ProteinForTreeView> ProteinsForTreeView;
 
         /// <summary>
         /// Tracks peptides that span multiple lines in the coverage map
         /// Key: peptide, Value: (remaining residues to highlight, highlight row index)
         /// </summary>
-        private Dictionary<InSilicoPep, (int, int)> partialPeptideMatches = new Dictionary<InSilicoPep, (int, int)>();
+        private Dictionary<InSilicoPep, (int, int)> partialPeptideMatches = new();
 
         /// <summary>
         /// Maps each protease name to a unique WPF color for visualization
@@ -103,9 +104,9 @@ namespace GUI
         /// <param name="userParams">User-specified digestion parameters</param>
         /// <param name="sequenceCoverageByProtease">Pre-calculated sequence coverage statistics</param>
         public ProteinResultsWindow(
-            Dictionary<string, Dictionary<string, Dictionary<Protein, List<InSilicoPep>>>> peptideByFile,
+            Dictionary<string, Dictionary<string, Dictionary<IBioPolymer, List<InSilicoPep>>>> peptideByFile,
             RunParameters userParams,
-            Dictionary<string, Dictionary<Protein, (double, double)>> sequenceCoverageByProtease)
+            Dictionary<string, Dictionary<IBioPolymer, (double, double)>> sequenceCoverageByProtease)
         {
             InitializeComponent();
 
@@ -121,7 +122,7 @@ namespace GUI
             // Initialize GUI collections
             proteinList = new ObservableCollection<string>();
             filteredList = new ObservableCollection<string>();
-            ProteinsForTreeView = new Dictionary<Protein, ProteinForTreeView>();
+            ProteinsForTreeView = new Dictionary<IBioPolymer, ProteinForTreeView>();
 
             // Set up GUI-specific data structures
             SetUpProteinsForTreeView();
@@ -839,7 +840,7 @@ namespace GUI
             }
         }
 
-        private void SaveMetadata(string subFolder, string proteinName, Protein protein, List<InSilicoPep> allPeptides)
+        private void SaveMetadata(string subFolder, string proteinName, IBioPolymer protein, List<InSilicoPep> allPeptides)
         {
             const string tab = "\t";
             var metaData = new List<string>

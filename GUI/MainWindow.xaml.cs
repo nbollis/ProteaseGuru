@@ -1,7 +1,9 @@
-using Proteomics;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Diagnostics;
+using System.Globalization;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -15,17 +17,16 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 using Engine;
-using Tasks;
-using Proteomics.ProteolyticDigestion;
-using System.IO;
-using System.Globalization;
-using static Tasks.ProteaseGuruTask;
+using GuiFunctions;
 using MzLibUtil;
-using System.Diagnostics;
+using Omics;
 using Omics.Digestion;
 using Omics.Modifications;
+using Proteomics;
+using Proteomics.ProteolyticDigestion;
+using Tasks;
 using UsefulProteomicsDatabases;
-using GuiFunctions;
+using static Tasks.ProteaseGuruTask;
 
 namespace GUI
 {
@@ -34,10 +35,10 @@ namespace GUI
     /// </summary>
     public partial class MainWindow : Window
     {
-        private readonly ObservableCollection<ProteinDbForDataGrid> ProteinDbObservableCollection = new ObservableCollection<ProteinDbForDataGrid>();
-        private readonly ObservableCollection<ProteinDbForDataGrid> ReloadProteinDbObservableCollection = new ObservableCollection<ProteinDbForDataGrid>();
-        private readonly ObservableCollection<ResultsForDataGrid> ResultsObservableCollection = new ObservableCollection<ResultsForDataGrid>();
-        private readonly ObservableCollection<ParametersForDataGrid> ParametersObservableCollection = new ObservableCollection<ParametersForDataGrid>();
+        private readonly ObservableCollection<ProteinDbForDataGrid> ProteinDbObservableCollection = new();
+        private readonly ObservableCollection<ProteinDbForDataGrid> ReloadProteinDbObservableCollection = new();
+        private readonly ObservableCollection<ResultsForDataGrid> ResultsObservableCollection = new();
+        private readonly ObservableCollection<ParametersForDataGrid> ParametersObservableCollection = new();
         private readonly ObservableCollection<RunSummaryForTreeView> SummaryForTreeViewObservableCollection;
 
         private readonly DigestionConditionsSetupViewModel ParametersViewModel;
@@ -564,8 +565,8 @@ namespace GUI
             stopwatch.Start();
             RunStatus.Items.Add(runProgressBar);
             var results = await Task.Run(() => a.Run());
-            Dictionary<string, Dictionary<string, Dictionary<Protein, List<InSilicoPep>>>> peptidesByFile = results.PeptideByFile;
-            Dictionary<string, Dictionary<Protein, (double, double)>> sequenceCoverageByProtease = results.SequenceCoverageByProtease;
+            Dictionary<string, Dictionary<string, Dictionary<IBioPolymer, List<InSilicoPep>>>> peptidesByFile = results.PeptideByFile;
+            Dictionary<string, Dictionary<IBioPolymer, (double, double)>> sequenceCoverageByProtease = results.SequenceCoverageByProtease;
             stopwatch.Stop();
 
             runProgressBar.IsIndeterminate = false;
@@ -581,8 +582,8 @@ namespace GUI
         //logic for loading in results from previous runs and opening up the results windows
         private void LoadResults_Click(object sender, RoutedEventArgs e)
         {
-            Dictionary<string, Dictionary<string, Dictionary<Protein, List<InSilicoPep>>>> PeptidesByFileSetUp = new Dictionary<string, Dictionary<string, Dictionary<Protein, List<InSilicoPep>>>>();
-            Dictionary<string, Dictionary<string, Dictionary<Protein, List<InSilicoPep>>>> PeptidesByFile = new Dictionary<string, Dictionary<string, Dictionary<Protein, List<InSilicoPep>>>>();
+            Dictionary<string, Dictionary<string, Dictionary<IBioPolymer, List<InSilicoPep>>>> PeptidesByFileSetUp = new();
+            Dictionary<string, Dictionary<string, Dictionary<IBioPolymer, List<InSilicoPep>>>> PeptidesByFile = new();
 
             RunParameters loadedParams = new RunParameters();
 
@@ -590,7 +591,7 @@ namespace GUI
             string proteaseFilePath = System.IO.Path.Combine(proteaseDirectory, @"proteases.tsv");
             var myLines = File.ReadAllLines(proteaseFilePath);
             myLines = myLines.Skip(1).ToArray();
-            Dictionary<string, Protease> dict = new Dictionary<string, Protease>();
+            Dictionary<string, Protease> dict = new();
             foreach (string line in myLines)
             {
                 if (line.Trim() != string.Empty) // skip empty lines
@@ -610,7 +611,7 @@ namespace GUI
             foreach (var parameterFile in ParametersObservableCollection)
             {
                 var fileData = File.ReadAllLines(parameterFile.FilePath);
-                List<string> proteaseNames = new List<string>();
+                List<string> proteaseNames = new();
                 int missedCleavages = 0;
                 int minPeptideLength = 0;
                 int maxPeptideLength = 0;
@@ -676,7 +677,7 @@ namespace GUI
                 loadedParams.MaxPeptideMassAllowed = maxPeptideMass;
             }
 
-            List<InSilicoPep> allpeptides = new List<InSilicoPep>();
+            List<InSilicoPep> allpeptides = new();
             foreach (var resultFile in ResultsObservableCollection)
             {
                 var fileData = File.ReadAllLines(resultFile.FilePath);
@@ -744,7 +745,7 @@ namespace GUI
                     var proteinsFromDb = LoadProteins(new DbForDigestion(db.FilePath));
                     var proteaseParams = loadedParams.ProteaseSpecificParameters;
 
-                    Dictionary<Protein, List<InSilicoPep>> proteinDic = new Dictionary<Protein, List<InSilicoPep>>();
+                    Dictionary<IBioPolymer, List<InSilicoPep>> proteinDic = new();
 
                     foreach (var protein in proteinsFromDb)
                     {
@@ -753,7 +754,7 @@ namespace GUI
                             proteinDic.Add(protein, new List<InSilicoPep>() { });
                         }                        
                     }
-                    Dictionary<string, Dictionary<Protein, List<InSilicoPep>>> proteaseDic = new Dictionary<string, Dictionary<Protein, List<InSilicoPep>>>();
+                    Dictionary<string, Dictionary<IBioPolymer, List<InSilicoPep>>> proteaseDic = new();
                     foreach (var proteaseParam in proteaseParams)
                     {
                         if (!proteaseDic.ContainsKey(proteaseParam.DigestionAgentName))
@@ -770,12 +771,12 @@ namespace GUI
                 foreach (var entry in PeptidesByFileSetUp)
                 {
                     var pepByDb = allpeptides.Where(p => p.Database == entry.Key).ToList();
-                    Dictionary<string, Dictionary<Protein, List<InSilicoPep>>> proteaseComplete = new Dictionary<string, Dictionary<Protein, List<InSilicoPep>>>();
+                    Dictionary<string, Dictionary<IBioPolymer, List<InSilicoPep>>> proteaseComplete = new();
                     foreach (var protease in entry.Value)
                     {
                         var pepByProtease = pepByDb.Where(p => p.Protease == protease.Key).ToList();
 
-                        Dictionary<Protein, List<InSilicoPep>> proteinComplete = new Dictionary<Protein, List<InSilicoPep>>();
+                        Dictionary<IBioPolymer, List<InSilicoPep>> proteinComplete = new();
 
                         foreach (var protein in protease.Value)
                         {
@@ -918,8 +919,8 @@ namespace GUI
         //load proteins from reloaded databases
         protected List<Protein> LoadProteins(DbForDigestion database)
         {
-            List<string> dbErrors = new List<string>();
-            List<Protein> proteinList = new List<Protein>();
+            List<string> dbErrors = new();
+            List<Protein> proteinList = new();
 
             string theExtension = System.IO.Path.GetExtension(database.FilePath).ToLowerInvariant();
             bool compressed = theExtension.EndsWith("gz"); // allows for .bgz and .tgz, too which are used on occasion
@@ -937,7 +938,7 @@ namespace GUI
             }
             else
             {
-                List<string> modTypesToExclude = new List<string> { };
+                List<string> modTypesToExclude = new() { };
                 proteinList = ProteinDbLoader.LoadProteinXML(database.FilePath, true, DecoyType.None, GlobalVariables.AllModsKnown, false, modTypesToExclude,
                     out Dictionary<string, Modification> um, -1, 4, 1);
                 
@@ -960,10 +961,10 @@ namespace GUI
             }
         }
 
-        private Dictionary<string, Dictionary<Protein, (double, double)>> CalculateProteinSequenceCoverage(Dictionary<string, Dictionary<string, Dictionary<Protein, List<InSilicoPep>>>> peptideByFile)
+        private Dictionary<string, Dictionary<IBioPolymer, (double, double)>> CalculateProteinSequenceCoverage(Dictionary<string, Dictionary<string, Dictionary<IBioPolymer, List<InSilicoPep>>>> peptideByFile)
         {
-            Dictionary<string, List<InSilicoPep>> allDatabasePeptidesByProtease = new Dictionary<string, List<InSilicoPep>>();
-            HashSet<Protein> proteins = new HashSet<Protein>();
+            Dictionary<string, List<InSilicoPep>> allDatabasePeptidesByProtease = new();
+            HashSet<IBioPolymer> proteins = new();
             foreach (var database in peptideByFile)
             {
                 foreach (var protease in database.Value)
@@ -987,11 +988,11 @@ namespace GUI
                 }
             }
 
-            Dictionary<string, Dictionary<Protein, (double, double)>> proteinSequenceCoverageByProtease = new Dictionary<string, Dictionary<Protein, (double, double)>>();
+            Dictionary<string, Dictionary<IBioPolymer, (double, double)>> proteinSequenceCoverageByProtease = new();
             foreach (var protease in allDatabasePeptidesByProtease)
             {
                 var proteinForProtease = protease.Value.GroupBy(p => p.Protein).ToDictionary(group => group.Key, group => group.ToList());
-                Dictionary<Protein, (double, double)> sequenceCoverages = new Dictionary<Protein, (double, double)>();
+                Dictionary<IBioPolymer, (double, double)> sequenceCoverages = new();
                 foreach (var protein in proteinForProtease)
                 {
                     //count which residues are covered at least one time by a peptide

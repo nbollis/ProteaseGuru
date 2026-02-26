@@ -1,11 +1,3 @@
-using Engine;
-using OxyPlot;
-using OxyPlot.Axes;
-using OxyPlot.Legends;
-using OxyPlot.Series;
-using Proteomics;
-using Proteomics.ProteolyticDigestion;
-using Proteomics.RetentionTimePrediction;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -13,6 +5,15 @@ using System.ComponentModel;
 using System.Globalization;
 using System.Linq;
 using System.Windows;
+using Engine;
+using Omics;
+using OxyPlot;
+using OxyPlot.Axes;
+using OxyPlot.Legends;
+using OxyPlot.Series;
+using Proteomics;
+using Proteomics.ProteolyticDigestion;
+using Proteomics.RetentionTimePrediction;
 using Tasks;
 
 namespace GUI
@@ -21,17 +22,17 @@ namespace GUI
     public class PlotModelStat : INotifyPropertyChanged, IPlotModel
     {
         private PlotModel privateModel;
-        private readonly List<InSilicoPep> AllPeptides = new List<InSilicoPep>();
-        public Dictionary<string, List<InSilicoPep>> PeptidesByProtease = new Dictionary<string, List<InSilicoPep>>();
-        public Dictionary<string, Dictionary<Protein, (double, double)>> SequenceCoverageByProtease_Return = new Dictionary<string, Dictionary<Protein, (double, double)>>();
-        private readonly Dictionary<string, List<double>> SequenceCoverageByProtease = new Dictionary<string, List<double>>();
-        private readonly Dictionary<string, List<double>> SequenceCoverageUniqueByProtease = new Dictionary<string, List<double>>();
-        private readonly Dictionary<string, List<double>> UniquePeptidesPerProtein = new Dictionary<string, List<double>>();
-        List<string> Proteases = new List<string>();
+        private readonly List<InSilicoPep> AllPeptides = new();
+        public Dictionary<string, List<InSilicoPep>> PeptidesByProtease = new();
+        public Dictionary<string, Dictionary<IBioPolymer, (double, double)>> SequenceCoverageByProtease_Return = new();
+        private readonly Dictionary<string, List<double>> SequenceCoverageByProtease = new();
+        private readonly Dictionary<string, List<double>> SequenceCoverageUniqueByProtease = new();
+        private readonly Dictionary<string, List<double>> UniquePeptidesPerProtein = new();
+        List<string> Proteases = new();
         //access series stuff here
-        public Dictionary<string, Dictionary<string, string>> DataTable = new Dictionary<string, Dictionary<string, string>>();
+        public Dictionary<string, Dictionary<string, string>> DataTable = new();
 
-        private static List<OxyColor> columnColors = new List<OxyColor>
+        private static List<OxyColor> columnColors = new()
         {
            OxyColor.FromRgb(130, 88, 159), OxyColor.FromRgb(0, 148, 50), OxyColor.FromRgb(181, 52, 113), OxyColor.FromRgb(52, 152, 219), OxyColor.FromRgb(230, 126, 34), OxyColor.FromRgb(27, 20, 100), OxyColor.FromRgb(253, 167, 223),
            OxyColor.FromRgb(99, 110, 114), OxyColor.FromRgb(255, 221, 89), OxyColor.FromRgb(162, 155, 254), OxyColor.FromRgb(58, 227, 116), OxyColor.FromRgb(252, 66, 123),
@@ -66,17 +67,17 @@ namespace GUI
             }
         }
 
-        public PlotModelStat(string plotName, List<string> dbSelected, Dictionary<string, Dictionary<string, Dictionary<Protein, List<InSilicoPep>>>> peptideByFile, RunParameters userParams, Dictionary<string, Dictionary<Protein, (double, double)>> sequenceCoverageByProtease)
+        public PlotModelStat(string plotName, List<string> dbSelected, Dictionary<string, Dictionary<string, Dictionary<IBioPolymer, List<InSilicoPep>>>> peptideByFile, RunParameters userParams, Dictionary<string, Dictionary<IBioPolymer, (double, double)>> sequenceCoverageByProtease)
         {
             privateModel = new PlotModel { Title = plotName, DefaultFontSize = 12 };
 
-            Dictionary<string, Dictionary<Protein, List<InSilicoPep>>> databasePeptides = new Dictionary<string, Dictionary<Protein, List<InSilicoPep>>>();
+            Dictionary<string, Dictionary<IBioPolymer, List<InSilicoPep>>> databasePeptides = new();
 
             if (dbSelected.Count() > 1)
             {
                 MessageBox.Show("Note: More than one protein database has been selected. Unique peptides are defined as being unique to a single protein in all selected databases.");
 
-                List<InSilicoPep> allPeptides = new List<InSilicoPep>();
+                List<InSilicoPep> allPeptides = new();
 
                 foreach (var db in dbSelected)
                 {
@@ -90,7 +91,7 @@ namespace GUI
                     }
                 }
 
-                Dictionary<string, List<InSilicoPep>> peptidesToProteins = new Dictionary<string, List<InSilicoPep>>();
+                Dictionary<string, List<InSilicoPep>> peptidesToProteins = new();
 
                 if (plotName == " Protein Sequence Coverage (Unique Peptides Only)" || plotName == " Number of Unique Peptides per Protein")
                 {
@@ -117,7 +118,7 @@ namespace GUI
                                 {
                                     if (databasePeptides[entry.Key].ContainsKey(prot.Key))
                                     {
-                                        List<InSilicoPep> proteinSpecificPeptides = new List<InSilicoPep>();
+                                        List<InSilicoPep> proteinSpecificPeptides = new();
                                         foreach (var peptide in prot.Value)
                                         {
                                             if (userParams.TreatModifiedPeptidesAsDifferent)
@@ -150,7 +151,7 @@ namespace GUI
                                     }
                                     else
                                     {
-                                        List<InSilicoPep> proteinSpecificPeptides = new List<InSilicoPep>();
+                                        List<InSilicoPep> proteinSpecificPeptides = new();
                                         foreach (var peptide in prot.Value)
                                         {
                                             if (userParams.TreatModifiedPeptidesAsDifferent)
@@ -184,10 +185,10 @@ namespace GUI
                             }
                             else
                             {
-                                Dictionary<Protein, List<InSilicoPep>> proteinDic = new Dictionary<Protein, List<InSilicoPep>>();
+                                Dictionary<IBioPolymer, List<InSilicoPep>> proteinDic = new();
                                 foreach (var prot in entry.Value)
                                 {
-                                    List<InSilicoPep> proteinSpecificPeptides = new List<InSilicoPep>();
+                                    List<InSilicoPep> proteinSpecificPeptides = new();
                                     foreach (var peptide in prot.Value)
                                     {
                                         if (userParams.TreatModifiedPeptidesAsDifferent)
@@ -248,10 +249,10 @@ namespace GUI
                             }
                             else
                             {
-                                Dictionary<Protein, List<InSilicoPep>> proteinDic = new Dictionary<Protein, List<InSilicoPep>>();
+                                Dictionary<IBioPolymer, List<InSilicoPep>> proteinDic = new();
                                 foreach (var prot in entry.Value)
                                 {
-                                    List<InSilicoPep> proteinSpecificPeptides = new List<InSilicoPep>();
+                                    List<InSilicoPep> proteinSpecificPeptides = new();
                                     proteinDic.Add(prot.Key, prot.Value);
                                 }
                                 databasePeptides.Add(entry.Key, proteinDic);
@@ -269,13 +270,13 @@ namespace GUI
                 SequenceCoverageByProtease_Return = CalculateProteinSequenceCoverage(databasePeptides);
             }
 
-            List<InSilicoPep> peptides = new List<InSilicoPep>();
-            Dictionary<string, List<InSilicoPep>> peptidesByProtease = new Dictionary<string, List<InSilicoPep>>();
+            List<InSilicoPep> peptides = new();
+            Dictionary<string, List<InSilicoPep>> peptidesByProtease = new();
 
 
             foreach (var protease in databasePeptides)
             {
-                List<InSilicoPep> proteasePeptides = new List<InSilicoPep>();
+                List<InSilicoPep> proteasePeptides = new();
                 foreach (var protein in protease.Value)
                 {
                     proteasePeptides.AddRange(protein.Value);
@@ -407,7 +408,7 @@ namespace GUI
 
             string yAxisTitle = "Count";
             string xAxisTitle = "Amino Acid";
-            Dictionary<string, Dictionary<char, int>> dictsByProtease = new Dictionary<string, Dictionary<char, int>>();
+            Dictionary<string, Dictionary<char, int>> dictsByProtease = new();
             List<char> aminoAcids = new List<char>() { 'A', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'K', 'L', 'M', 'N', 'P', 'Q', 'R', 'S', 'T', 'V', 'W', 'Y' };
             foreach (var protease in PeptidesByProtease)
             {
@@ -529,8 +530,8 @@ namespace GUI
             double binSize = -1;
             double labelAngle = 0;
             SortedList<double, double> numCategory = new SortedList<double, double>();
-            Dictionary<string, IEnumerable<double>> numbersByProtease = new Dictionary<string, IEnumerable<double>>();
-            Dictionary<string, Dictionary<string, int>> dictsByProtease = new Dictionary<string, Dictionary<string, int>>();
+            Dictionary<string, IEnumerable<double>> numbersByProtease = new();
+            Dictionary<string, Dictionary<string, int>> dictsByProtease = new();
 
             switch (plotType)
             {
@@ -734,12 +735,12 @@ namespace GUI
         }
 
         //calculate the protein sequence coverage of each protein based on its digested peptides (for all peptides and unique peptides)
-        private Dictionary<string, Dictionary<Protein, (double, double)>> CalculateProteinSequenceCoverage(Dictionary<string, Dictionary<Protein, List<InSilicoPep>>> peptidesByProtease)
+        private Dictionary<string, Dictionary<IBioPolymer, (double, double)>> CalculateProteinSequenceCoverage(Dictionary<string, Dictionary<IBioPolymer, List<InSilicoPep>>> peptidesByProtease)
         {
-            Dictionary<string, Dictionary<Protein, (double, double)>> proteinSequenceCoverageByProtease = new Dictionary<string, Dictionary<Protein, (double, double)>>();
+            Dictionary<string, Dictionary<IBioPolymer, (double, double)>> proteinSequenceCoverageByProtease = new();
             foreach (var protease in peptidesByProtease)
             {
-                Dictionary<Protein, (double, double)> sequenceCoverages = new Dictionary<Protein, (double, double)>();
+                Dictionary<IBioPolymer, (double, double)> sequenceCoverages = new();
                 foreach (var protein in protease.Value)
                 {
                     //count which residues are covered at least one time by a peptide                    

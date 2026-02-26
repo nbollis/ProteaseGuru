@@ -10,6 +10,7 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
+using Omics;
 using OxyPlot;
 using Proteomics;
 using Tasks;
@@ -24,19 +25,19 @@ namespace GUI
     {        
         private readonly ObservableCollection<string> listOfProteinDbs; 
         ICollectionView proteinDBView;
-        private readonly Dictionary<string, Dictionary<string, Dictionary<Protein, List<InSilicoPep>>>> PeptideByFile;
+        private readonly Dictionary<string, Dictionary<string, Dictionary<IBioPolymer, List<InSilicoPep>>>> PeptideByFile;
         List<string> DBSelected;
         RunParameters UserParams;
-        public Dictionary<string, Dictionary<string, string>> HistogramDataTable = new Dictionary<string, Dictionary<string, string>>();
+        public Dictionary<string, Dictionary<string, string>> HistogramDataTable = new();
         public string SelectedPlot;
         private Dictionary<string, List<InSilicoPep>> PeptidesByProtease;
-        private Dictionary<string, Dictionary<Protein,(double,double)>> SequenceCoverageByProtease = new Dictionary<string, Dictionary<Protein, (double, double)>>();
+        private Dictionary<string, Dictionary<IBioPolymer, (double,double)>> SequenceCoverageByProtease = new();
         
         public HistogramWindow()
         {
         }
 
-        public HistogramWindow(Dictionary<string, Dictionary<string, Dictionary<Protein, List<InSilicoPep>>>> peptideByFile, RunParameters userParams, Dictionary<string, Dictionary<Protein, (double, double)>> sequenceCoverageByProtease) // change constructor to receive analysis information
+        public HistogramWindow(Dictionary<string, Dictionary<string, Dictionary<IBioPolymer, List<InSilicoPep>>>> peptideByFile, RunParameters userParams, Dictionary<string, Dictionary<IBioPolymer, (double, double)>> sequenceCoverageByProtease) // change constructor to receive analysis information
         {
             InitializeComponent();
             PeptideByFile = peptideByFile;
@@ -109,7 +110,7 @@ namespace GUI
         {
             //clear the exportable data table when a new plot is selected
             HistogramDataTable.Clear();            
-            Dictionary<string, Dictionary<Protein, (double, double)>> sequenceCoverageByProtease = SequenceCoverageByProtease;
+            Dictionary<string, Dictionary<IBioPolymer, (double, double)>> sequenceCoverageByProtease = SequenceCoverageByProtease;
             //figure out which proteases should be used to make the plot
             if (dataGridProteinDBs.SelectedItems.Count == 0)
             {
@@ -149,7 +150,7 @@ namespace GUI
             var selectedPlot = HistogramComboBox.SelectedItem;
             var objectName = selectedPlot.ToString().Split(':');
             var plotName = objectName[1];            
-            Dictionary<string, Dictionary<Protein, (double, double)>> sequenceCoverageByProtease = SequenceCoverageByProtease;
+            Dictionary<string, Dictionary<IBioPolymer, (double, double)>> sequenceCoverageByProtease = SequenceCoverageByProtease;
             if (dataGridProteinDBs.SelectedItems == null)
             {
                 DBSelected.Add(listOfProteinDbs.First());
@@ -228,10 +229,10 @@ namespace GUI
                 Clipboard.SetText(Path.Combine(fileDirectory, fileName));
             }
 
-            Dictionary<string, IEnumerable<double>> numbersByProtease = new Dictionary<string, IEnumerable<double>>();    // key is protease name, value is data from that protease
-            Dictionary<string, Dictionary<string, int>> dictsByProtease = new Dictionary<string, Dictionary<string, int>>();   // key is protease name, value is dictionary of bins and their counts
+            Dictionary<string, IEnumerable<double>> numbersByProtease = new();    // key is protease name, value is data from that protease
+            Dictionary<string, Dictionary<string, int>> dictsByProtease = new();   // key is protease name, value is dictionary of bins and their counts
 
-            Dictionary<string, List<double>> UniquePeptidesPerProtein = new Dictionary<string, List<double>>();
+            Dictionary<string, List<double>> UniquePeptidesPerProtein = new();
 
 
             foreach (var protease in PeptidesByProtease)
@@ -249,7 +250,7 @@ namespace GUI
             {               
                 case " Protein Sequence Coverage": // Protein Sequence Coverage                    
                     binSize = 0.01;
-                    Dictionary<string, List<double>> sequenceCoverageByProtease = new Dictionary<string, List<double>>();
+                    Dictionary<string, List<double>> sequenceCoverageByProtease = new();
                     foreach (var protease in SequenceCoverageByProtease)
                     {
                             List<double> coverages = new List<double>();
@@ -272,7 +273,7 @@ namespace GUI
                     break;
                 case " Protein Sequence Coverage (Unique Peptides Only)": // Protein Sequence Coverage (unique peptides)                    
                     binSize = 0.01;
-                    Dictionary<string, List<double>> sequenceCoverageUniqueByProtease = new Dictionary<string, List<double>>();
+                    Dictionary<string, List<double>> sequenceCoverageUniqueByProtease = new();
                     foreach (var protease in SequenceCoverageByProtease)
                     {
                             List<double> coverages = new List<double>();
@@ -308,10 +309,10 @@ namespace GUI
             }
             if (dictsByProtease.Count() != 0)
             {
-                Dictionary<string, Dictionary<string, string>> detailedTable = new Dictionary<string, Dictionary<string, string>>();
+                Dictionary<string, Dictionary<string, string>> detailedTable = new();
                 double binValue = 0;
                 var proteases = dictsByProtease.Keys;
-                Dictionary<string, string> proteaseSetUp = new Dictionary<string, string>();
+                Dictionary<string, string> proteaseSetUp = new();
                 foreach (var protease in proteases)
                 {
                     proteaseSetUp.Add(protease, "0");
@@ -338,7 +339,7 @@ namespace GUI
                             }
                             else
                             {
-                                Dictionary<string, string> proteaseDetails = new Dictionary<string, string>();
+                                Dictionary<string, string> proteaseDetails = new();
                                 proteaseDetails.Add(protease, proteaseSpecific[binNumber].ToString());
                                 detailedTable.Add(binString, proteaseDetails);
                             }
@@ -358,7 +359,7 @@ namespace GUI
                             }
                             else
                             {
-                                Dictionary<string, string> proteaseDetails = new Dictionary<string, string>();
+                                Dictionary<string, string> proteaseDetails = new();
                                 proteaseDetails.Add(protease, "0");
                                 detailedTable.Add(binString, proteaseDetails);
                             }

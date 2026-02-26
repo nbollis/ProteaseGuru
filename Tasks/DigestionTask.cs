@@ -34,7 +34,7 @@ namespace Tasks
         #region Chronologer Predictor Pool
 
         // Instance-scoped predictor pool to avoid cross-instance race conditions
-        private readonly object _predictorLock = new object();
+        private readonly object _predictorLock = new();
         private ConcurrentBag<ChronologerRetentionTimePredictor>? _predictorPool;
         private bool _disposed;
 
@@ -486,7 +486,7 @@ namespace Tasks
             return double.IsNaN(mobility) ? 0 : mobility;
         }
 
-        private static readonly HashSet<string> ShiftingModifications = new HashSet<string>(StringComparer.Ordinal)
+        private static readonly HashSet<string> ShiftingModifications = new(StringComparer.Ordinal)
         {
             "Acetylation", "Ammonia loss", "Carbamyl", "Deamidation", "Formylation",
             "N2-acetylarginine", "N6-acetyllysine", "N-acetylalanine", "N-acetylaspartate",
@@ -746,7 +746,7 @@ namespace Tasks
             }
 
             // Write digestion conditions
-            List<string> parameters = new List<string>();
+            List<string> parameters = new();
 
             // write shared parameters for all digestions to a text file in the output folder
             parameters.Add("Digestion Conditions:");
@@ -796,7 +796,7 @@ namespace Tasks
             {
                 for (int i = 0; i < userParams.ProteaseSpecificParameters.Count; i++)
                 {
-                    List<string> specificParams = new List<string>();
+                    List<string> specificParams = new();
                     if (missedCleavages is not null)
                     {
                         specificParams.Add("Missed Cleavages: " + missedCleavages[i]);

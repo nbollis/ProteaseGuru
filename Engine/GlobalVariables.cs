@@ -9,9 +9,9 @@ namespace Engine
 {
     public static class GlobalVariables
     {
-        private static List<Modification> _AllModsKnown = new List<Modification>();
-        private static HashSet<string> _AllModTypesKnown = new HashSet<string>(); 
-        public static List<Modification> ProteaseMods = new List<Modification>();
+        private static List<Modification> _AllModsKnown = new();
+        private static HashSet<string> _AllModTypesKnown = new(); 
+        public static List<Modification> ProteaseMods = new();
         
 
         //Characters that aren't amino acids, but are reserved for special uses (motifs, delimiters, mods, etc)
@@ -94,7 +94,7 @@ namespace Engine
             RefreshAminoAcidDictionary();            
         }
 
-        public static List<string> ErrorsReadingMods = new List<string>();
+        public static List<string> ErrorsReadingMods = new();
 
         // File locations
         public static string DataDir { get; }
@@ -173,7 +173,7 @@ namespace Engine
             if (File.Exists(aminoAcidPath)) //if it already exists
             {
                 string[] aminoAcidLines = File.ReadAllLines(aminoAcidPath);
-                List<Residue> residuesToAdd = new List<Residue>();
+                List<Residue> residuesToAdd = new();
                 for (int i = 1; i < aminoAcidLines.Length; i++)
                 {
 
@@ -218,7 +218,7 @@ namespace Engine
                 Directory.CreateDirectory(directory);
             }
             string aminoAcidPath = Path.Combine(DataDir, @"CustomAminoAcids", @"CustomAminoAcids.txt");
-            List<string> linesToWrite = new List<string> { "Name\tOneLetterAbbr.\tMonoisotopicMass\tChemicalFormula" };
+            List<string> linesToWrite = new() { "Name\tOneLetterAbbr.\tMonoisotopicMass\tChemicalFormula" };
             for (char letter = 'A'; letter <= 'Z'; letter++) //just the basic residues
             {
                 if (Residue.TryGetResidue(letter, out Residue residue))

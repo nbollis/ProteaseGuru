@@ -50,7 +50,7 @@ namespace GUI
         {
             string proteaseDirectory = System.IO.Path.Combine(GlobalVariables.DataDir, @"ProteolyticDigestion");
             string proteaseFilePath = System.IO.Path.Combine(proteaseDirectory, @"proteases.tsv");
-            List<string> proteaseFileText = new List<string>();
+            List<string> proteaseFileText = new();
             proteaseFileText = File.ReadAllLines(proteaseFilePath).ToList();
 
             //all of the protease properties that the user provided

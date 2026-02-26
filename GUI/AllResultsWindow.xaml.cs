@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Linq;
 using System.Windows.Controls;
+using Omics;
 using Proteomics;
 using Tasks;
 
@@ -13,16 +13,16 @@ namespace GUI
     public partial class AllResultsWindow : UserControl
     {
         private readonly ObservableCollection<ProteaseSummaryForTreeView> SummaryForTreeViewObservableCollection;           
-        private readonly Dictionary<string, Dictionary<string, Dictionary<Protein, List<InSilicoPep>>>> PeptideByFile;        
+        private readonly Dictionary<string, Dictionary<string, Dictionary<IBioPolymer, List<InSilicoPep>>>> PeptideByFile;        
         RunParameters UserParams;
-        public Dictionary<string, Dictionary<string, string>> HistogramDataTable = new Dictionary<string, Dictionary<string, string>>();
+        public Dictionary<string, Dictionary<string, string>> HistogramDataTable = new();
 
         public AllResultsWindow()
         {
         }
 
         //Sets up the All ResultsWindow
-        public AllResultsWindow(Dictionary<string, Dictionary<string, Dictionary<Protein, List<InSilicoPep>>>> peptideByFile, RunParameters userParams) // change constructor to receive analysis information
+        public AllResultsWindow(Dictionary<string, Dictionary<string, Dictionary<IBioPolymer, List<InSilicoPep>>>> peptideByFile, RunParameters userParams) // change constructor to receive analysis information
         {
             InitializeComponent();
             PeptideByFile = peptideByFile;
@@ -40,7 +40,7 @@ namespace GUI
             {
                 ProteaseSummaryForTreeView allDatabases = new ProteaseSummaryForTreeView("Cumulative Database Results:");
                 //get all the peptides from all the databases together
-                Dictionary<string, List<InSilicoPep>> allDatabasePeptidesByProtease = new Dictionary<string, List<InSilicoPep>>();
+                Dictionary<string, List<InSilicoPep>> allDatabasePeptidesByProtease = new();
                              
                 foreach (var database in PeptideByFile)
                 {
@@ -63,7 +63,7 @@ namespace GUI
 
                 foreach (var protease in allDatabasePeptidesByProtease)
                 {
-                    Dictionary<string, List<InSilicoPep>> peptidesToProteins = new Dictionary<string, List<InSilicoPep>>();
+                    Dictionary<string, List<InSilicoPep>> peptidesToProteins = new();
 
                     if (UserParams.TreatModifiedPeptidesAsDifferent)
                     {
@@ -78,7 +78,7 @@ namespace GUI
                     var sharedPeptidesInOneDb = shared.Where(p => p.Value.Select(p => p.Database).Distinct().Count() == 1);
                     var uniquePeptidesInOneDb = unique.Where(p => p.Value.Select(p => p.Database).Distinct().Count() == 1);
 
-                    List<InSilicoPep> peptidesInOneDb = new List<InSilicoPep>();
+                    List<InSilicoPep> peptidesInOneDb = new();
                     int sharedCount = shared.Count;
                     int uniqueCount = unique.Count;
 
