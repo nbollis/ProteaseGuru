@@ -28,4 +28,6 @@ public class ProteaseSpecificParameters
     public IDigestionParams DigestionParams { get; set; }
     public List<Modification> FixedMods { get; set; }
     public List<Modification> VariableMods { get; set; }
+
+    public ProteaseSpecificParameters Clone() => new(DigestionParams.Clone(), [..FixedMods], [..VariableMods]);
 }
