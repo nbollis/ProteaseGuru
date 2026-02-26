@@ -14,8 +14,8 @@ public class DigestionConditionsSetupViewModel : BaseViewModel
 
     public ObservableCollection<ProteaseSpecificParametersViewModel> ProteaseSpecificParameters { get; } = new();
 
-    private readonly Parameters _parameters;
-    public Parameters Parameters
+    private readonly RunParameters _parameters;
+    public RunParameters Parameters
     {
         get
         {
@@ -27,9 +27,9 @@ public class DigestionConditionsSetupViewModel : BaseViewModel
         }
     }
 
-    public DigestionConditionsSetupViewModel(Parameters? parameters)
+    public DigestionConditionsSetupViewModel(RunParameters? parameters)
     {
-        _parameters = parameters ?? new Parameters();
+        _parameters = parameters ?? new RunParameters();
         OxidativeMethionine = GlobalVariables.AllModsKnown.First(p => p.IdWithMotif == "Oxidation on M");
         Carbamidomethylation = GlobalVariables.AllModsKnown.First(p => p.IdWithMotif == "Carbamidomethyl on C");
 

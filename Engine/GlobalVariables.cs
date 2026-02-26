@@ -3,6 +3,7 @@ using Proteomics.AminoAcidPolymer;
 using Proteomics.ProteolyticDigestion;
 using System.Diagnostics;
 using Omics.Modifications;
+using Omics.Modifications.IO;
 
 namespace Engine
 {
@@ -101,7 +102,7 @@ namespace Engine
         public static string ProteaseGuruVersion { get; }        
         public static IEnumerable<Modification> UnimodDeserialized { get; }
         public static IEnumerable<Modification> UniprotDeseralized { get; }
-        public static UsefulProteomicsDatabases.Generated.obo PsiModDeserialized { get; }
+        public static obo PsiModDeserialized { get; }
         public static IEnumerable<Modification> AllModsKnown { get { return _AllModsKnown.AsEnumerable(); } }
         public static IEnumerable<string> AllModTypesKnown { get { return _AllModTypesKnown.AsEnumerable(); } }
         public static Dictionary<string, Modification> AllModsKnownDictionary { get; private set; }        
