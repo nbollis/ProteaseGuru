@@ -70,7 +70,7 @@ namespace Engine
 
             foreach (var modFile in Directory.GetFiles(Path.Combine(DataDir, @"Mods")))
             {
-                AddMods(UsefulProteomicsDatabases.PtmListLoader.ReadModsFromFile(modFile, out var errorMods), false);
+                AddMods(Omics.Modifications.IO.ModificationLoader.ReadModsFromFile(modFile, out var errorMods), false);
             }
 
             AddMods(UniprotDeseralized.OfType<Modification>(), false);
@@ -87,8 +87,8 @@ namespace Engine
                 // no error thrown if multiple mods with this ID are present - just pick one
             }
 
-            ProteaseMods = UsefulProteomicsDatabases.PtmListLoader.ReadModsFromFile(Path.Combine(DataDir, @"Mods", @"ProteaseMods.txt"), out var errors).ToList();
-            ProteaseDictionary.Dictionary = ProteaseDictionary.LoadProteaseDictionary(Path.Combine(DataDir, @"ProteolyticDigestion", @"proteases.tsv"), ProteaseMods);
+            ProteaseMods = ModificationLoader.ReadModsFromFile(Path.Combine(DataDir, @"Mods", @"ProteaseMods.txt"), out var errors).ToList();
+            ProteaseDictionary.LoadAndMergeCustomProteases(Path.Combine(DataDir, @"ProteolyticDigestion", @"proteases.tsv"), ProteaseMods);
 
             RefreshAminoAcidDictionary();            
         }

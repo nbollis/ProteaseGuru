@@ -233,8 +233,10 @@ namespace Test
                 param.TreatModifiedPeptidesAsDifferent = false;
                 param.OutputFolder = subFolder;
 
+                var t = ProteaseDictionary.Dictionary;
+                var name = ProteaseDictionary.NormalizeProteaseName("trypsin (cleave before proline)");
                 DigestionParams trypsin = new DigestionParams(
-                    protease: "trypsin (cleave before proline)",
+                    protease: name,
                     maxMissedCleavages: 0,
                     minPeptideLength: 1,
                     maxPeptideLength: 100);
