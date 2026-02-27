@@ -18,6 +18,7 @@
         <SolidColorBrush x:Key="RnaAccentColor" Color="#a64ef9" />
         <SolidColorBrush x:Key="RnaLightAccentColor" Color="#FFC4C4FF" />
         <SolidColorBrush x:Key="RnaSideBarMainColor" Color="#433d49" />
+        <SolidColorBrush x:Key="LightAccentColor" Color="#bdf0ff" />
         
         <!-- Icons -->
         <BitmapImage x:Key="ProteinIcon" UriSource="Icons/IconProtein.bmp"/>

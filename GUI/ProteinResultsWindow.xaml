@@ -5,8 +5,12 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              mc:Ignorable="d"
              xmlns:gui="clr-namespace:GUI"
+             xmlns:local="clr-namespace:GUI"
+             xmlns:guiFunctions="clr-namespace:GuiFunctions;assembly=GuiFunctions"
              d:DesignHeight="600" d:DesignWidth="1200">
     <UserControl.Resources>
+
+        <local:ProteinRnaTerminologyConverter x:Key="ProtTermConverter" />
 
         <SolidColorBrush x:Key="BackgroundColor" Color="#D5D5D5" />
         <SolidColorBrush x:Key="TextColor1" Color="#131313" />
@@ -94,11 +98,23 @@
         </Grid.RowDefinitions>
 
         <!--Header label-->
-        <Label Content="Protein Search" Grid.Row="0" Style="{StaticResource HeaderLabelStyle}" />
+        <Label Grid.Row="0" Style="{StaticResource HeaderLabelStyle}">
+            <Label.Content>
+                <Binding Converter="{StaticResource ProtTermConverter}"  Source="{x:Static guiFunctions:GuiGlobalParamsViewModel.Instance}" Path ="IsRnaMode"
+                         ConverterParameter="Protein Search"/>
+            </Label.Content>
+        </Label>
 
         <!--Detail text-->
         <TextBlock Grid.Row="1" Style="{StaticResource TextBlockStyle}">
-            Search for a specific protein accessions to view its digestion results both numerically and as a protein sequence coverage map.
+            <Run>
+                <Run.Text>
+                    <Binding Path="IsRnaMode"
+                             Source="{x:Static guiFunctions:GuiGlobalParamsViewModel.Instance}"
+                             Converter="{StaticResource ProtTermConverter}"
+                             ConverterParameter="Search for a specific protein accessions to view its digestion results both numerically and as a protein sequence coverage map." />
+                </Run.Text>
+            </Run>
         </TextBlock>
 
         <Grid Grid.Row ="2" Style="{StaticResource InternalGridStyle}">
@@ -125,7 +141,12 @@
                     <Label Height="30" DockPanel.Dock="Left">Search</Label>
                     <TextBox Name="SearchTextBox" TextChanged="Search_TextChanged" DockPanel.Dock="Right"></TextBox>
                 </DockPanel>
-                <Label Content="Protein Accessions" Grid.Row="1" Style="{StaticResource SmallHeaderLabelStyle}" />
+                <Label Grid.Row="1" Style="{StaticResource SmallHeaderLabelStyle}">
+                    <Label.Content>
+                        <Binding Converter="{StaticResource ProtTermConverter}"  Source="{x:Static guiFunctions:GuiGlobalParamsViewModel.Instance}" Path ="IsRnaMode"
+                                 ConverterParameter="Protein Accessions"/>
+                    </Label.Content>
+                </Label>
 
                 <Grid Grid.Row="2" Style="{StaticResource InternalGridStyle}">
                     <Grid.ColumnDefinitions>
@@ -154,7 +175,14 @@
                     <RowDefinition Height="30"></RowDefinition>
                 </Grid.RowDefinitions>
                 <!--Header label-->
-                <Label Content="Protease Selections" Grid.Row="0" Style="{StaticResource SmallHeaderLabelStyle}"  HorizontalContentAlignment="Center"/>
+                <Label  Grid.Row="0" Style="{StaticResource SmallHeaderLabelStyle}"  HorizontalContentAlignment="Center">
+                    <Label.Content>
+                        <Binding Converter="{StaticResource ProtTermConverter}"  Source="{x:Static guiFunctions:GuiGlobalParamsViewModel.Instance}" Path ="IsRnaMode"
+                                                             ConverterParameter="Protease Selection">
+
+                        </Binding>
+                    </Label.Content>
+                </Label>
                 <ScrollViewer VerticalScrollBarVisibility="Visible" HorizontalScrollBarVisibility="Auto" Grid.Row="1" Grid.Column="1">
                     <ListBox Name ="ProteaseSelectedForUse" SelectionMode="Multiple" Loaded="proteaseCoverageMaps_loaded" ItemContainerStyle="{StaticResource ListBoxItem}">
                     </ListBox>
@@ -179,7 +207,12 @@
                         <RowDefinition Height="*"></RowDefinition>
                     </Grid.RowDefinitions>
                     <!--Header label-->
-                    <Label Content="Protein Digestion Summary" Grid.Row="0" Style="{StaticResource SmallHeaderLabelStyle}" />
+                    <Label Grid.Row="0" Style="{StaticResource SmallHeaderLabelStyle}">
+                        <Label.Content>
+                            <Binding Converter="{StaticResource ProtTermConverter}"  Source="{x:Static guiFunctions:GuiGlobalParamsViewModel.Instance}" Path ="IsRnaMode"
+                                     ConverterParameter="Protein Digestion Summary"/>
+                        </Label.Content>
+                    </Label>
 
                     <!-- FIXED: Added Grid.Row="1" to place content below the header -->
                     <StackPanel Grid.Row="1">
@@ -198,31 +231,22 @@
                                   AlternatingRowBackground="#F5F5F5"
                                   Margin="5">
                             <DataGrid.Columns>
-                                <DataGridTextColumn Header="Protease" 
-                                                    Binding="{Binding Protease}" 
-                                                    Width="Auto" 
-                                                    MinWidth="150"/>
-                                <DataGridTextColumn Header="Unique Peptides" 
-                                                    Binding="{Binding UniquePeptides}" 
-                                                    Width="Auto">
+                                <DataGridTextColumn Width="Auto" MinWidth="150" Header="Digestion Agent" Binding="{Binding Protease}" />
+                                <DataGridTextColumn Width="Auto" Binding="{Binding UniquePeptides}" Header="Unique">
                                     <DataGridTextColumn.ElementStyle>
                                         <Style TargetType="TextBlock">
                                             <Setter Property="HorizontalAlignment" Value="Center"/>
                                         </Style>
                                     </DataGridTextColumn.ElementStyle>
                                 </DataGridTextColumn>
-                                <DataGridTextColumn Header="Shared Peptides" 
-                                                    Binding="{Binding SharedPeptides}" 
-                                                    Width="Auto">
+                                <DataGridTextColumn Width="Auto" Binding="{Binding SharedPeptides}" Header="Shared">
                                     <DataGridTextColumn.ElementStyle>
                                         <Style TargetType="TextBlock">
                                             <Setter Property="HorizontalAlignment" Value="Center"/>
                                         </Style>
                                     </DataGridTextColumn.ElementStyle>
                                 </DataGridTextColumn>
-                                <DataGridTextColumn Header="Total Peptides" 
-                                                    Binding="{Binding TotalPeptides}" 
-                                                    Width="Auto">
+                                <DataGridTextColumn Width="Auto" Binding="{Binding TotalPeptides}" Header="Total">
                                     <DataGridTextColumn.ElementStyle>
                                         <Style TargetType="TextBlock">
                                             <Setter Property="HorizontalAlignment" Value="Center"/>
@@ -260,7 +284,12 @@
                     </Grid.RowDefinitions>
 
                     <!--Header label-->
-                    <Label Content="Protein Sequence Coverage Map" Grid.Row="0" Style="{StaticResource SmallHeaderLabelStyle}" />
+                    <Label Grid.Row="0" Style="{StaticResource SmallHeaderLabelStyle}">
+                        <Label.Content>
+                            <Binding Converter="{StaticResource ProtTermConverter}"  Source="{x:Static guiFunctions:GuiGlobalParamsViewModel.Instance}" Path ="IsRnaMode"
+                                     ConverterParameter="Protein Sequence Coverage Map"/>
+                        </Label.Content>
+                    </Label>
                     <ScrollViewer Grid.Row="1" Name="mapViewer" HorizontalAlignment="Center" VerticalAlignment="Center" 
                                   CanContentScroll="True" VerticalScrollBarVisibility="Visible" Width="775">
                         <Grid Name="mapGrid" Background="White">
@@ -276,7 +305,12 @@
 
                     </ScrollViewer>
 
-                    <Button x:Name="exportPngButton" Content="Export Protein Digestion Results" Click="exportCoverageMap" Grid.Row="3" Width="250" Style="{StaticResource ImportantButtonStyle}"/>
+                    <Button x:Name="exportPngButton" Click="exportCoverageMap" Grid.Row="3" Width="250" Style="{StaticResource ImportantButtonStyle}">
+                        <Button.Content>
+                            <Binding Converter="{StaticResource ProtTermConverter}"  Source="{x:Static guiFunctions:GuiGlobalParamsViewModel.Instance}" Path ="IsRnaMode"
+                                     ConverterParameter="Export Protein Digestion Results"/>
+                        </Button.Content>
+                    </Button>
 
                 </Grid>
             </Grid>

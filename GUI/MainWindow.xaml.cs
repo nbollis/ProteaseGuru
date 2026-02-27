@@ -48,10 +48,9 @@ namespace GUI
         public MainWindow()
         {
             InitializeComponent();
-            Title = "ProteaseGuru: Version " + GlobalVariables.ProteaseGuruVersion;
 
             // TODO: Set up default parameters to check for
-            ParametersViewModel = new(new RunParameters());
+            ParametersViewModel = new(new());
             digestionConditionsControl.DataContext = ParametersViewModel;
           
             dataGridProteinDatabases.DataContext = ProteinDbObservableCollection;
@@ -61,7 +60,6 @@ namespace GUI
             EverythingRunnerEngine.NewDbsHandler += AddNewDB;
             EverythingRunnerEngine.WarnHandler += GuiWarnHandler;
             DigestionTask.OutLabelStatusHandler += NewoutLabelStatus;
-            GuiGlobalParamsViewModel.RequestModeSwitchConfirmation += HandleModeSwitchConfirmation;
             SummaryForTreeViewObservableCollection = new ObservableCollection<RunSummaryForTreeView>();
         }
 
@@ -850,7 +848,7 @@ namespace GUI
             }
             runSummary.Summary.Add(databases);
             
-            CategorySummaryForTreeView proteases = new CategorySummaryForTreeView("Proteases:");
+            CategorySummaryForTreeView proteases = new CategorySummaryForTreeView($"{GlobalVariables.AnalyteType.GetDigestionAgentLabel()}s:");
             foreach (var proteaseParam in ParametersViewModel.ProteaseSpecificParameters.Where(p => p.IsSelected))
             {
                 proteases.Summary.Add(new FeatureForTreeView(proteaseParam.DigestionAgentName));
@@ -874,33 +872,33 @@ namespace GUI
                 }
                 else
                 {
-                    parameters.Summary.Add(new FeatureForTreeView("Number of Missed Cleavages: Varies by protease"));
+                    parameters.Summary.Add(new FeatureForTreeView($"Number of Missed Cleavages: Varies by {GlobalVariables.AnalyteType.GetDigestionAgentLabel()}"));
                 }
 
                 if (allSameMinLength)
                 {
-                    FeatureForTreeView minPep = new FeatureForTreeView("Minimum Peptide Length: " + firstParams.MinLength);
+                    FeatureForTreeView minPep = new FeatureForTreeView($"Minimum {GlobalVariables.AnalyteType.GetUniqueFormLabel()} Length: " + firstParams.MinLength);
                     parameters.Summary.Add(minPep);
                 }
                 else
                 {
-                    parameters.Summary.Add(new FeatureForTreeView("Minimum Peptide Length: Varies by protease"));
+                    parameters.Summary.Add(new FeatureForTreeView($"Minimum {GlobalVariables.AnalyteType.GetUniqueFormLabel()} Length: Varies by {GlobalVariables.AnalyteType.GetDigestionAgentLabel()}"));
                 }
 
                 if (allSameMaxLength)
                 {
-                    FeatureForTreeView maxPep = new FeatureForTreeView("Maximum Peptide Length: " + firstParams.MaxLength);
+                    FeatureForTreeView maxPep = new FeatureForTreeView($"Maximum {GlobalVariables.AnalyteType.GetUniqueFormLabel()} Length: " + firstParams.MaxLength);
                     parameters.Summary.Add(maxPep);
                 }
                 else
                 {
-                    parameters.Summary.Add(new FeatureForTreeView("Maximum Peptide Length: Varies by protease"));
+                    parameters.Summary.Add(new FeatureForTreeView($"Maximum {GlobalVariables.AnalyteType.GetUniqueFormLabel()} Length: Varies by {GlobalVariables.AnalyteType.GetDigestionAgentLabel()}"));
                 }
             }
 
-            FeatureForTreeView modPep = new FeatureForTreeView("Treat Modified Peptides as Different Peptides: " + ParametersViewModel.TreatModifiedPeptidesAsDifferent);           
-            FeatureForTreeView minMass = new FeatureForTreeView("Minimum Peptide Mass: " + ParametersViewModel.MinPeptideMass);                    
-            FeatureForTreeView maxMass = new FeatureForTreeView("Maximum Peptide Mass: " + ParametersViewModel.MaxPeptideMass);
+            FeatureForTreeView modPep = new FeatureForTreeView($"Treat Modified {GlobalVariables.AnalyteType.GetUniqueFormLabel()}s as Different {GlobalVariables.AnalyteType.GetUniqueFormLabel()}s: " + ParametersViewModel.TreatModifiedPeptidesAsDifferent);           
+            FeatureForTreeView minMass = new FeatureForTreeView($"Minimum {GlobalVariables.AnalyteType.GetUniqueFormLabel()} Mass: " + ParametersViewModel.MinPeptideMass);                    
+            FeatureForTreeView maxMass = new FeatureForTreeView($"Maximum {GlobalVariables.AnalyteType.GetUniqueFormLabel()} Mass: " + ParametersViewModel.MaxPeptideMass);
             
             parameters.Summary.Add(modPep);
             parameters.Summary.Add(minMass);
@@ -1051,49 +1049,6 @@ namespace GUI
         {
             if (GuiGlobalParamsViewModel.Instance.IsDirty())
                 GuiGlobalParamsViewModel.Instance.Save();
-        }
-
-        private void HandleModeSwitchConfirmation(object sender, ModeSwitchRequestEventArgs e)
-        {
-            // No files loaded, just return and switch modes
-            if (ParametersViewModel.ProteaseSpecificParameters.Count(p => p is { IsSelected: true, IsVisible: true }) == 0 && ProteinDbObservableCollection.IsNullOrEmpty())
-            {
-                e.Result = ModeSwitchResult.SwitchKeepFiles;
-                return;
-            }
-
-            if (!Dispatcher.CheckAccess())
-            {
-                Dispatcher.Invoke(() => HandleModeSwitchConfirmation(sender, e));
-                return;
-            }
-
-            if (GuiGlobalParamsViewModel.Instance.AskAboutModeSwitch)
-            {
-                var confirmationWindow = new ModeSwitchConfirmationWindow(e)
-                {
-                    Owner = this
-                };
-
-                confirmationWindow.ShowDialog();
-            }
-            else
-            {
-                e.Result = GuiGlobalParamsViewModel.Instance.CachedModeSwitchResult;
-            }
-
-
-            if (e.Result == ModeSwitchResult.SwitchRemoveFiles)
-            {
-                DeleteAll(sender, new());
-            }
-        }
-
-        private void DeleteAll(object sender, object o)
-        {
-            ProteinDbObservableCollection.Clear();
-            // TODO: handle param resetting. 
-            throw new NotImplementedException();
         }
     }
 }

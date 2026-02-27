@@ -11,9 +11,6 @@ using OxyPlot;
 using OxyPlot.Axes;
 using OxyPlot.Legends;
 using OxyPlot.Series;
-using Proteomics;
-using Proteomics.ProteolyticDigestion;
-using Proteomics.RetentionTimePrediction;
 using Tasks;
 
 namespace GUI
@@ -67,15 +64,27 @@ namespace GUI
             }
         }
 
+        public bool MessageShow = true;
+
+        
+
         public PlotModelStat(string plotName, List<string> dbSelected, Dictionary<string, Dictionary<string, Dictionary<IBioPolymer, List<InSilicoPep>>>> peptideByFile, RunParameters userParams, Dictionary<string, Dictionary<IBioPolymer, (double, double)>> sequenceCoverageByProtease)
         {
-            privateModel = new PlotModel { Title = plotName, DefaultFontSize = 12 };
+            privateModel = new PlotModel { Title = (string)ProteinRnaTerminologyConverter.Instance.Convert(plotName, GetType(), null, CultureInfo.InvariantCulture), DefaultFontSize = 12 };
 
             Dictionary<string, Dictionary<IBioPolymer, List<InSilicoPep>>> databasePeptides = new();
-
-            if (dbSelected.Count() > 1)
+            // Show informational message about unique peptide definition (once per session)
+            if (MessageShow)
             {
-                MessageBox.Show("Note: More than one protein database has been selected. Unique peptides are defined as being unique to a single protein in all selected databases.");
+                var message = dbSelected.Count > 1
+                    ? $"Note: More than one database was analyzed. Unique peptides are defined as being unique to a single {GlobalVariables.AnalyteType.GetUniqueFormLabel()} in all analyzed databases."
+                    : $"Note: One database was analyzed. Unique peptides are defined as being unique to a single {GlobalVariables.AnalyteType.GetUniqueFormLabel()} in the analyzed database.";
+                MessageBox.Show(message);
+                MessageShow = false;
+            }
+
+            if (dbSelected.Count > 1)
+            {
 
                 List<InSilicoPep> allPeptides = new();
 
@@ -265,7 +274,6 @@ namespace GUI
             }
             else
             {
-                MessageBox.Show("Note: One protein database has been selected. Unique peptides are defined as being unique to a single protein in this database.");
                 databasePeptides = peptideByFile[dbSelected.FirstOrDefault()];
                 SequenceCoverageByProtease_Return = CalculateProteinSequenceCoverage(databasePeptides);
             }
@@ -516,7 +524,7 @@ namespace GUI
             // OxyPlot 2.2: Legend properties moved to separate Legend object
             var legend = new Legend
             {
-                LegendTitle = "Protease",
+                LegendTitle = $"{GlobalVariables.AnalyteType.GetDigestionAgentLabel()}",
                 LegendPlacement = LegendPlacement.Outside,
                 LegendPosition = LegendPosition.BottomLeft,
                 LegendFontSize = 12,
@@ -536,7 +544,7 @@ namespace GUI
             switch (plotType)
             {
                 case 1: // Peptide Length
-                    xAxisTitle = "Peptide Length";
+                    xAxisTitle = $"{GlobalVariables.AnalyteType.GetUniqueFormLabel()} Length";
                     binSize = 1;
                     foreach (string key in PeptidesByProtease.Keys)
                     {
@@ -546,7 +554,7 @@ namespace GUI
                     }
                     break;
                 case 2: // Protein Sequence Coverage
-                    xAxisTitle = "Protein Sequence Coverage";
+                    xAxisTitle = $"{GlobalVariables.AnalyteType.GetBioPolymerLabel()} Sequence Coverage";
                     binSize = 0.10;
                     foreach (string key in SequenceCoverageByProtease.Keys)
                     {
@@ -557,7 +565,7 @@ namespace GUI
                     }
                     break;
                 case 3: // Protein Sequence Coverage (unique peptides)
-                    xAxisTitle = "Protein Sequence Coverage (Unique Peptides Only)";
+                    xAxisTitle = $"{GlobalVariables.AnalyteType.GetBioPolymerLabel()} Sequence Coverage (Unique {GlobalVariables.AnalyteType.GetUniqueFormLabel()}s Only)";
                     binSize = 0.10;
                     foreach (string key in SequenceCoverageUniqueByProtease.Keys)
                     {
@@ -568,7 +576,7 @@ namespace GUI
                     }
                     break;
                 case 4: // Number of Unique Peptides per Protein
-                    xAxisTitle = "Number of Unique Peptides per Protein";
+                    xAxisTitle = $"Number of Unique {GlobalVariables.AnalyteType.GetUniqueFormLabel()}s per Protein";
                     binSize = 10;
                     double maxValue = 0;
                     double minValue = 0;
@@ -593,7 +601,7 @@ namespace GUI
                     }
                     break;
                 case 5: // Predicted Peptide Hydrophobicity
-                    xAxisTitle = "Predicted Peptide Hydrophobicity";
+                    xAxisTitle = $"Predicted {GlobalVariables.AnalyteType.GetUniqueFormLabel()} Hydrophobicity";
                     binSize = 5;
                     foreach (string key in PeptidesByProtease.Keys)
                     {
@@ -603,7 +611,7 @@ namespace GUI
                     }
                     break;
                 case 6: // Predicted Peptide Electrophoretic Mobility
-                    xAxisTitle = "Predicted Peptide Electrophoretic Mobility";
+                    xAxisTitle = $"Predicted {GlobalVariables.AnalyteType.GetUniqueFormLabel()} Electrophoretic Mobility";
                     binSize = 0.005;
                     foreach (string key in PeptidesByProtease.Keys)
                     {

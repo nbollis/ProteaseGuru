@@ -256,6 +256,12 @@ namespace Tasks
                 mobilityValues = BatchCalculateElectrophoreticMobility(allPeptides);
                 retentionTimesChronologer = BatchCalculateRetentionTimesChronologer(allPeptides);
             }
+            else
+            {
+                hydrophobicityValues = new double[allWithSetMods.Count];
+                mobilityValues = new double[allWithSetMods.Count];
+                retentionTimesChronologer = new double[allWithSetMods.Count];
+            }
 
             // Create a lookup from peptide to its calculated values
             var peptideToIndex = new Dictionary<IBioPolymerWithSetMods, int>();

@@ -4,6 +4,7 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
+using Engine;
 using Omics;
 using Omics.BioPolymer;
 using Omics.Modifications;
@@ -340,8 +341,8 @@ namespace GUI
             if (MessageShow)
             {
                 string message = _analyzer.IsMultiDatabase
-                    ? "Note: More than one protein database was analyzed. Unique peptides are defined as being unique to a single protein in all analyzed databases."
-                    : "Note: One protein database was analyzed. Unique peptides are defined as being unique to a single protein in the analyzed database.";
+                    ? $"Note: More than one database was analyzed. Unique peptides are defined as being unique to a single {GlobalVariables.AnalyteType.GetUniqueFormLabel()} in all analyzed databases."
+                    : $"Note: One database was analyzed. Unique peptides are defined as being unique to a single {GlobalVariables.AnalyteType.GetUniqueFormLabel()} in the analyzed database.";
                 MessageBox.Show(message);
                 MessageShow = false;
             }

@@ -12,6 +12,7 @@ public class DigestionConditionsSetupViewModel : BaseViewModel
 {
     public Modification OxidativeMethionine { get; init; }
     public Modification Carbamidomethylation { get; init; }
+    public Modification CyclicPhosphate { get; init; }
 
     public ObservableCollection<ProteaseSpecificParametersViewModel> ProteaseSpecificParameters { get; } = new();
 
@@ -33,6 +34,7 @@ public class DigestionConditionsSetupViewModel : BaseViewModel
         _parameters = parameters ?? new RunParameters();
         OxidativeMethionine = GlobalVariables.AllModsKnown.First(p => p.IdWithMotif == "Oxidation on M");
         Carbamidomethylation = GlobalVariables.AllModsKnown.First(p => p.IdWithMotif == "Carbamidomethyl on C");
+        CyclicPhosphate = Mods.GetModification("Cyclic Phosphate on X", false, true);
 
         PopulateProteaseCollection();
 
@@ -124,7 +126,7 @@ public class DigestionConditionsSetupViewModel : BaseViewModel
         set
         {
             _applyFixedCarbamidomethylation = value;
-            foreach (var specificParams in ProteaseSpecificParameters.Where(p => p.IsVisible && !p.ProteaseSpecificParams.FixedMods.Contains(Carbamidomethylation)))
+            foreach (var specificParams in ProteaseSpecificParameters.Where(p => p is { IsRna: false, IsVisible: true } && !p.ProteaseSpecificParams.FixedMods.Contains(Carbamidomethylation)))
             {
                 specificParams.ProteaseSpecificParams.FixedMods.Add(Carbamidomethylation);
             }
@@ -138,11 +140,26 @@ public class DigestionConditionsSetupViewModel : BaseViewModel
         get => _applyVariableOxidation;
         set
         {
+            if (_applyVariableOxidation == value) return;
+
             _applyVariableOxidation = value;
-            foreach (var specificParams in ProteaseSpecificParameters.Where(p => p.IsVisible && !p.ProteaseSpecificParams.VariableMods.Contains(OxidativeMethionine)))
+            var variableMod = GuiGlobalParamsViewModel.Instance.IsRnaMode ? CyclicPhosphate : OxidativeMethionine;
+
+            if (_applyVariableOxidation)
             {
-                specificParams.ProteaseSpecificParams.VariableMods.Add(OxidativeMethionine);
+                foreach (var specificParams in ProteaseSpecificParameters.Where(p => p.IsVisible && !p.ProteaseSpecificParams.VariableMods.Contains(variableMod)))
+                {
+                    specificParams.ProteaseSpecificParams.VariableMods.Add(OxidativeMethionine);
+                }
             }
+            else
+            {
+                foreach (var specificParams in ProteaseSpecificParameters.Where(p => p.IsVisible && p.ProteaseSpecificParams.VariableMods.Contains(variableMod)))
+                {
+                    specificParams.ProteaseSpecificParams.VariableMods.Remove(OxidativeMethionine);
+                }
+            }
+
             OnPropertyChanged(nameof(ApplyVariableOxidation));
         }
     }

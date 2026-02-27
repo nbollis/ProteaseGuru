@@ -29,55 +29,17 @@ public class GuiGlobalParamsViewModel : BaseViewModel
 
     #region Protease / Rnase Mode
 
-    public static EventHandler<ModeSwitchRequestEventArgs>? RequestModeSwitchConfirmation { get; set; }
-    public bool AskAboutModeSwitch
-    {
-        get => _current.AskAboutModeSwitch;
-        set { _current.AskAboutModeSwitch = value; OnPropertyChanged(nameof(AskAboutModeSwitch)); }
-    }
-
     public bool IsRnaMode
     {
         get => _current.IsRnaMode;
         set
         {
-            // Invoke the event to check if the user wants to switch modes
-            var args = new ModeSwitchRequestEventArgs();
-
-            // Sent from Test or other sources without UI initialization. 
-            if (RequestModeSwitchConfirmation is null)
-                args.Result = ModeSwitchResult.SwitchKeepFiles;
-            // Ask the GUI how to move forward
-            // - If we have a default saved and are told not to ask, it will skip the pop-up
-            // - if no files are loaded it will tell us to switch, otherwise it will trigger a pop-up
-            else
-                RequestModeSwitchConfirmation?.Invoke(this, args);
-
-            if (args.RememberMyDecision)
-            {
-                AskAboutModeSwitch = false;
-                CachedModeSwitchResult = args.Result;
-            }
-
-            // Do not switch - Force UI to refresh to original state
-            if (args.Result == ModeSwitchResult.Cancel)
-            {
-                OnPropertyChanged(nameof(IsRnaMode));
-                return;
-            }
-
             _current.IsRnaMode = value;
             GlobalVariables.AnalyteType = _current.IsRnaMode ? AnalyteType.Oligo : AnalyteType.Peptide;
 
             OnPropertyChanged(nameof(IsRnaMode));
             OnPropertyChanged(nameof(MainWindowTitle));
         }
-    }
-
-    public ModeSwitchResult CachedModeSwitchResult
-    {
-        get => _current.CachedModeSwitchResult;
-        set { _current.CachedModeSwitchResult = value; OnPropertyChanged(nameof(CachedModeSwitchResult)); }
     }
 
     #endregion

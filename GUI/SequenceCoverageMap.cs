@@ -5,6 +5,7 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
 using System.Windows.Shapes;
+using Engine;
 
 namespace GUI
 {
@@ -278,9 +279,9 @@ namespace GUI
             // Updated to include three categories
             string[] peptideCategories = new string[3]
             {
-                "Shared peptides (translucent)",
-                "Unique peptides (bold)",
-                "Not covered (underlined)"
+                $"Shared {GlobalVariables.AnalyteType.GetUniqueFormLabel()} (translucent)",
+                $"Unique {GlobalVariables.AnalyteType.GetUniqueFormLabel()} (bold)",
+                $"Not covered (underlined)"
             };
 
             foreach (string peptide in peptideCategories)

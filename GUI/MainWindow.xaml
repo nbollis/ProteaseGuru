@@ -15,6 +15,8 @@
     <Window.Resources>
         <ResourceDictionary>
 
+            <local:ProteinRnaTerminologyConverter x:Key="ProtTermConverter" />
+
             <Style x:Key="DataGridCellStyle" TargetType="DataGridCell">
             </Style>
 
@@ -357,48 +359,108 @@
 
                     <!--Text content-->
                     <TextBlock Grid.Row="2" Grid.RowSpan="2" Style="{StaticResource TextBlockStyle}"> 
-                       
-                        ProteaseGuru is a in silico digestion program facilitating the comparison of proteolytic digests. It accepts protein databases (.xml or .fasta) as input and allows
-                        <LineBreak />
-                         users to set digestion conditions and proteases for digestion. ProteaseGuru is designed to help users determine which protease or combination of proteases would yield the best experimental results.
+                        <Run>
+                            <Run.Text>
+                                <Binding Path="IsRnaMode"
+                                         Source="{x:Static guiFunctions:GuiGlobalParamsViewModel.Instance}"
+                                         Converter="{StaticResource ProtTermConverter}"
+                                         ConverterParameter="ProteaseGuru is a in silico digestion program facilitating the comparison of proteolytic digests. It accepts protein databases (.xml or .fasta) as input and allows users to set digestion conditions and proteases for digestion. ProteaseGuru is designed to help users determine which protease or combination of proteases would yield the best experimental results." />
+                            </Run.Text>
+                        </Run>
                         
+                        <LineBreak />
+                        <LineBreak />
+                        <LineBreak />
                         
-                        <LineBreak />
-                        <LineBreak />
-                        <LineBreak />
-                        ProteaseGuru is especially helpful for the planning of the following experiment types:
+                        <Run>
+                            <Run.Text>
+                                <Binding Path="IsRnaMode"
+                                         Source="{x:Static guiFunctions:GuiGlobalParamsViewModel.Instance}"
+                                         Converter="{StaticResource ProtTermConverter}"
+                                         ConverterParameter="ProteaseGuru is especially helpful for the planning of the following experiment types:" />
+                            </Run.Text>
+                        </Run>
+                        
                         <LineBreak />                        
                         <LineBreak />
-                        ● Experiments targeting specific proteins.
+                        
+                        <Run>
+                            <Run.Text>
+                                <Binding Path="IsRnaMode"
+                                         Source="{x:Static guiFunctions:GuiGlobalParamsViewModel.Instance}"
+                                         Converter="{StaticResource ProtTermConverter}"
+                                         ConverterParameter="● Experiments targeting specific proteins." />
+                            </Run.Text>
+                        </Run>
+                        
                         <LineBreak />                        
                         <LineBreak />
-                        ● Experiments focusing on the discovery of PTMs and/or sequence variants.
+                        
+                        <Run>
+                            <Run.Text>
+                                <Binding Path="IsRnaMode"
+                                         Source="{x:Static guiFunctions:GuiGlobalParamsViewModel.Instance}"
+                                         Converter="{StaticResource ProtTermConverter}"
+                                         ConverterParameter="● Experiments focusing on the discovery of PTMs and/or sequence variants." />
+                            </Run.Text>
+                        </Run>
+                        
                         <LineBreak />                        
                         <LineBreak />
+                        
                         ● Experiments where the sample is composed of more than one species with sequence homology (e.g. xenografts).
-                        
                         
                         <LineBreak/>
                         <LineBreak />
                         <LineBreak />
+                        
                         ProteaseGuru provides:
+                        
                         <LineBreak />                        
                         <LineBreak />
+                        
                         ● The ability to analyze more than one database enabling its use with samples containing multiple species .
+                        
                         <LineBreak />                        
                         <LineBreak />
-                        ● Result files containing various biophysical properties of theoretical peptides such as their molecular weight,
+                        
+                        <Run>
+                            <Run.Text>
+                                <Binding Path="IsRnaMode"
+                                         Source="{x:Static guiFunctions:GuiGlobalParamsViewModel.Instance}"
+                                         Converter="{StaticResource ProtTermConverter}"
+                                         ConverterParameter="● Result files containing various biophysical properties of theoretical peptides such as their molecular weight, hydrophobicity and electrophoretic mobility." />
+                            </Run.Text>
+                        </Run>
+                        
                         <LineBreak />
-                        hydrophobicity and electrophoretic mobility.
                         <LineBreak />
-                        <LineBreak />
+                        
                         ● Determination of the uniqueness of a theoretical sequence (both in a single database and all databases used for analysis).
+                        
                         <LineBreak /> 
                         <LineBreak />
-                        ● Histograms of whole proteome proteolytic digests for the direct comparison of proteases.
+                        
+                        <Run>
+                            <Run.Text>
+                                <Binding Path="IsRnaMode"
+                                         Source="{x:Static guiFunctions:GuiGlobalParamsViewModel.Instance}"
+                                         Converter="{StaticResource ProtTermConverter}"
+                                         ConverterParameter="● Histograms of whole proteome proteolytic digests for the direct comparison of proteases." />
+                            </Run.Text>
+                        </Run>
+                        
                         <LineBreak /> 
                         <LineBreak />
-                        ● Protein sequence coverage maps for visualization of the in silico digestion of targeted proteins.
+                        
+                        <Run>
+                            <Run.Text>
+                                <Binding Path="IsRnaMode"
+                                         Source="{x:Static guiFunctions:GuiGlobalParamsViewModel.Instance}"
+                                         Converter="{StaticResource ProtTermConverter}"
+                                         ConverterParameter="● Protein sequence coverage maps for visualization of the in silico digestion of targeted proteins." />
+                            </Run.Text>
+                        </Run>
                     </TextBlock>
                 </Grid>
             </TabItem>
@@ -413,18 +475,36 @@
                     </Grid.RowDefinitions>
 
                     <!--Header label-->
-                    <Label Content="Protein Databases" Grid.Row="0" Style="{StaticResource HeaderLabelStyle}" />
+                    <Label Grid.Row="0" Style="{StaticResource HeaderLabelStyle}">
+                        <Label.Content>
+                            <Binding Converter="{StaticResource ProtTermConverter}"  Source="{x:Static guiFunctions:GuiGlobalParamsViewModel.Instance}" Path ="IsRnaMode"
+                                     ConverterParameter="Protein Databases"/>
+                        </Label.Content>
+                    </Label>
 
                     <!--Detail text-->
                     <TextBlock Grid.Row="1" Style="{StaticResource TextBlockStyle}">
-                        Add 
+                        <Run Text="Add " />
                         
                         <Hyperlink NavigateUri="https://www.uniprot.org/" RequestNavigate="Hyperlink_RequestNavigate">
-                            protein database(s)
+                            <Run>
+                                <Run.Text>
+                                    <Binding Path="IsRnaMode"
+                                             Source="{x:Static guiFunctions:GuiGlobalParamsViewModel.Instance}"
+                                             Converter="{StaticResource ProtTermConverter}"
+                                             ConverterParameter="protein database(s)" />
+                                </Run.Text>
+                            </Run>
                         </Hyperlink> 
                         
-                        in .xml or .fasta format. Databases in .xml format can contain post-translational modification (PTM) locations,
-                        whereas .fasta format only contains amino acid sequences.
+                        <Run>
+                            <Run.Text>
+                                <Binding Path="IsRnaMode"
+                                         Source="{x:Static guiFunctions:GuiGlobalParamsViewModel.Instance}"
+                                         Converter="{StaticResource ProtTermConverter}"
+                                         ConverterParameter=" in .xml or .fasta format. Databases in .xml format can contain post-translational modification (PTM) locations, whereas .fasta format only contains amino acid sequences." />
+                            </Run.Text>
+                        </Run>
                     </TextBlock>
 
                     <DataGrid Grid.Row="2" x:Name="dataGridProteinDatabases"  Style="{StaticResource x:DataGridStyle}" ColumnHeaderStyle="{StaticResource DataGridColumnHeaderStyle}" ItemsSource="{Binding}">
@@ -454,7 +534,11 @@
 
             </TabItem>
 
-            <TabItem Header="Digestion Conditions" Style="{StaticResource TabItemStyle}">
+            <TabItem Style="{StaticResource TabItemStyle}">
+                <TabItem.Header>
+                    <Binding Converter="{StaticResource ProtTermConverter}"  Source="{x:Static guiFunctions:GuiGlobalParamsViewModel.Instance}" Path ="IsRnaMode"
+                             ConverterParameter="Digestion Conditions"/>
+                </TabItem.Header>
                 <local:DigestionConditions x:Name="digestionConditionsControl" />
             </TabItem>
 
@@ -474,7 +558,14 @@
 
                     <!--Detail text-->
                     <TextBlock Grid.Row="1" Style="{StaticResource TextBlockStyle}">
-                       Summary of the databases, proteases and conditions that will be used for analysis.
+                        <Run>
+                            <Run.Text>
+                                <Binding Path="IsRnaMode"
+                                         Source="{x:Static guiFunctions:GuiGlobalParamsViewModel.Instance}"
+                                         Converter="{StaticResource ProtTermConverter}"
+                                         ConverterParameter="Summary of the databases, proteases and conditions that will be used for analysis." />
+                            </Run.Text>
+                        </Run>
                         <LineBreak/>
                         If everything looks good, hit RUN!
                     </TextBlock>
@@ -543,11 +634,13 @@
                         </DockPanel>
                         
                     </Grid>
-                   
-                   
                 </Grid>
             </TabItem>
-            <TabItem Header="Load Previous Results" Style="{StaticResource TabItemStyle}" Name="LoadTab">
+            <TabItem Style="{StaticResource TabItemStyle}" Name="LoadTab">
+                <TabItem.Header>
+                    <Binding Converter="{StaticResource ProtTermConverter}"  Source="{x:Static guiFunctions:GuiGlobalParamsViewModel.Instance}" Path ="IsRnaMode"
+                             ConverterParameter="Load Previous Results"/>
+                </TabItem.Header>
                 <Grid Style="{StaticResource PageGridStyle}">
                     <Grid.RowDefinitions>
                         <RowDefinition Height="50"/>
@@ -567,11 +660,23 @@
                     </Grid.RowDefinitions>
 
                     <!--Header label-->
-                    <Label Content="Load Protease Guru Results" Grid.Row="0" Style="{StaticResource HeaderLabelStyle}" />
+                    <Label Grid.Row="0" Style="{StaticResource HeaderLabelStyle}">
+                        <Label.Content>
+                            <Binding Converter="{StaticResource ProtTermConverter}"  Source="{x:Static guiFunctions:GuiGlobalParamsViewModel.Instance}" Path ="IsRnaMode"
+                                     ConverterParameter="Load Protease Guru Results"/>
+                        </Label.Content>
+                    </Label>
 
                     <!--Detail text-->
                     <TextBlock Grid.Row="1" Style="{StaticResource TextBlockStyle}">
-                        Load in previous ProteaseGuru result files to go straight to data visualization.
+                        <Run>
+                            <Run.Text>
+                                <Binding Path="IsRnaMode"
+                                         Source="{x:Static guiFunctions:GuiGlobalParamsViewModel.Instance}"
+                                         Converter="{StaticResource ProtTermConverter}"
+                                         ConverterParameter="Load in previous ProteaseGuru result files to go straight to data visualization." />
+                            </Run.Text>
+                        </Run>
                     </TextBlock>
 
                     <!--Header label-->
@@ -658,22 +763,39 @@
                         <Button Grid.Column="0" x:Name="AddResults" Width ="200" Height="25" Content="Add" Click="AddResults_Click" Style="{StaticResource ImportantButtonStyle}" HorizontalAlignment="Right"/>
                         <Button Grid.Column="2" x:Name="ClearResults" Width="200" Height="25" Content="Clear" Click="ClearResults_Click" Style="{StaticResource ImportantButtonStyle}" HorizontalAlignment="Left"/>
                     </Grid>
-                    <Button Grid.Row="12" x:Name="LoadResults" Width="402" Height="40" Content="Load Results" Click="LoadResults_Click" Style="{StaticResource ImportantButtonStyle}"/>
+                    <Button Grid.Row="12" x:Name="LoadResults" Width="402" Height="40" Click="LoadResults_Click" Style="{StaticResource ImportantButtonStyle}">
+                        <Button.Content>
+                            <Binding Converter="{StaticResource ProtTermConverter}"  Source="{x:Static guiFunctions:GuiGlobalParamsViewModel.Instance}" Path ="IsRnaMode"
+                                     ConverterParameter="Load Results"/>
+                        </Button.Content>
+                    </Button>
                 </Grid>
             </TabItem>
             <TabItem  IsHitTestVisible="False" Style="{StaticResource TabItemStyle}">
 
             </TabItem>
 
-            <TabItem Header="Results Summary" Style="{StaticResource TabItemStyle}" Name="AllResultsTab">
+            <TabItem Style="{StaticResource TabItemStyle}" Name="AllResultsTab">
+                <TabItem.Header>
+                    <Binding Converter="{StaticResource ProtTermConverter}"  Source="{x:Static guiFunctions:GuiGlobalParamsViewModel.Instance}" Path ="IsRnaMode"
+                             ConverterParameter="Results Summary"/>
+                </TabItem.Header>
                 <local:AllResultsWindow/>
             </TabItem>
 
-            <TabItem Header="Histograms" Style="{StaticResource TabItemStyle}" Name="AllHistogramsTab">
+            <TabItem Style="{StaticResource TabItemStyle}" Name="AllHistogramsTab">
+                <TabItem.Header>
+                    <Binding Converter="{StaticResource ProtTermConverter}"  Source="{x:Static guiFunctions:GuiGlobalParamsViewModel.Instance}" Path ="IsRnaMode"
+                             ConverterParameter="Histograms"/>
+                </TabItem.Header>
                 <local:HistogramWindow/>
             </TabItem>
 
-            <TabItem Header="Protein Search" Style="{StaticResource TabItemStyle}" Name="ProteinCovMap">
+            <TabItem Name="ProteinCovMap" Style="{StaticResource TabItemStyle}">
+                <TabItem.Header>
+                    <Binding Converter="{StaticResource ProtTermConverter}"  Source="{x:Static guiFunctions:GuiGlobalParamsViewModel.Instance}" Path ="IsRnaMode"
+                             ConverterParameter="Protein Search"/>
+                </TabItem.Header>
                 <local:ProteinResultsWindow/>
             </TabItem>
 
@@ -752,7 +874,16 @@
                         <Button Grid.Row="2" Grid.Column="1" HorizontalContentAlignment="Left" BorderThickness="0" Click="MenuItem_MetaMorpheus_Click">
                             <StackPanel Orientation="Horizontal">
                                 <Image Source="Icons/MMnice.bmp" Width="20" Height="20" Margin="0,0,5,0"/>
-                                <TextBlock Text="Search proteomic data with MetaMorpheus" VerticalAlignment="Center" />
+                                <TextBlock VerticalAlignment="Center">
+                                    <Run>
+                                        <Run.Text>
+                                            <Binding Path="IsRnaMode"
+                                                     Source="{x:Static guiFunctions:GuiGlobalParamsViewModel.Instance}"
+                                                     Converter="{StaticResource ProtTermConverter}"
+                                                     ConverterParameter="Search proteomic data with MetaMorpheus" />
+                                        </Run.Text>
+                                    </Run>
+                                </TextBlock>
                             </StackPanel>
                         </Button>
 
@@ -766,7 +897,16 @@
                         <Button Grid.Row="4" Grid.Column="1" HorizontalContentAlignment="Left" BorderThickness="0" Click="MenuItem_ProteomicsNewsBlog_Click">
                             <StackPanel Orientation="Horizontal">
                                 <Image Source="Icons/Blogger_20.bmp" Width="20" Height="20" Margin="0,0,5,0"/>
-                                <TextBlock Text="Read News in Proteomics Research" VerticalAlignment="Center" />
+                                <TextBlock VerticalAlignment="Center">
+                                    <Run>
+                                        <Run.Text>
+                                            <Binding Path="IsRnaMode"
+                                                     Source="{x:Static guiFunctions:GuiGlobalParamsViewModel.Instance}"
+                                                     Converter="{StaticResource ProtTermConverter}"
+                                                     ConverterParameter="Read News in Proteomics Research" />
+                                        </Run.Text>
+                                    </Run>
+                                </TextBlock>
                             </StackPanel>
                         </Button>
                     </Grid>
