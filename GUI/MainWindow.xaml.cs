@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.ComponentModel;
 using System.Diagnostics;
 using System.Globalization;
 using System.IO;
@@ -60,6 +61,7 @@ namespace GUI
             EverythingRunnerEngine.NewDbsHandler += AddNewDB;
             EverythingRunnerEngine.WarnHandler += GuiWarnHandler;
             DigestionTask.OutLabelStatusHandler += NewoutLabelStatus;
+            GuiGlobalParamsViewModel.RequestModeSwitchConfirmation += HandleModeSwitchConfirmation;
             SummaryForTreeViewObservableCollection = new ObservableCollection<RunSummaryForTreeView>();
         }
 
@@ -1045,5 +1047,53 @@ namespace GUI
         //{
         //    GlobalVariables.StartProcess(@"https://www.youtube.com/channel/UCwPeeXcYSQBdbfXt-SdYhEg");
         //}
+        private void MainWindow_Closing(object? sender, CancelEventArgs e)
+        {
+            if (GuiGlobalParamsViewModel.Instance.IsDirty())
+                GuiGlobalParamsViewModel.Instance.Save();
+        }
+
+        private void HandleModeSwitchConfirmation(object sender, ModeSwitchRequestEventArgs e)
+        {
+            // No files loaded, just return and switch modes
+            if (ParametersViewModel.ProteaseSpecificParameters.Count(p => p.IsSelected) == 0 && ProteinDbObservableCollection.IsNullOrEmpty())
+            {
+                e.Result = ModeSwitchResult.SwitchKeepFiles;
+                return;
+            }
+
+            if (!Dispatcher.CheckAccess())
+            {
+                Dispatcher.Invoke(() => HandleModeSwitchConfirmation(sender, e));
+                return;
+            }
+
+            if (GuiGlobalParamsViewModel.Instance.AskAboutModeSwitch)
+            {
+                var confirmationWindow = new ModeSwitchConfirmationWindow(e)
+                {
+                    Owner = this
+                };
+
+                confirmationWindow.ShowDialog();
+            }
+            else
+            {
+                e.Result = GuiGlobalParamsViewModel.Instance.CachedModeSwitchResult;
+            }
+
+
+            if (e.Result == ModeSwitchResult.SwitchRemoveFiles)
+            {
+                DeleteAll(sender, new());
+            }
+        }
+
+        private void DeleteAll(object sender, object o)
+        {
+            ProteinDbObservableCollection.Clear();
+            // TODO: handle param resetting. 
+            throw new NotImplementedException();
+        }
     }
 }

@@ -4,11 +4,14 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:GUI"
+        xmlns:guiFunctions="clr-namespace:GuiFunctions;assembly=GuiFunctions"
         mc:Ignorable="d"
         Drop="Window_Drop" AllowDrop="true" 
         WindowStartupLocation="CenterScreen"
         Icon="proteaseGuru.ico"
-        Title="ProteaseGuru" Height="600" Width="1300">
+        Title="{Binding Source={x:Static guiFunctions:GuiGlobalParamsViewModel.Instance}, Path=MainWindowTitle}"
+        Closing="MainWindow_Closing"
+        Height="600" Width="1300">
     <Window.Resources>
         <ResourceDictionary>
 
@@ -200,21 +203,71 @@
                 <Setter Property="AutoGenerateColumns" Value="False"/>
             </Style>
 
+            <Style TargetType="TabControl" x:Key="TabControlStyle">
+                <Setter Property="Background" Value="{StaticResource SideBarMainColor}" />
+                <Setter Property="Template">
+                    <Setter.Value>
+                        <ControlTemplate TargetType="TabControl">
+                            <Grid ClipToBounds="true">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="Auto"/>
+                                    <!-- For tab headers -->
+                                    <ColumnDefinition Width="*"/>
+                                    <!-- For content -->
+                                </Grid.ColumnDefinitions>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="*"/>
+                                    <RowDefinition Height="Auto"/>
+                                </Grid.RowDefinitions>
 
+                                <!-- Actual Tab Headers -->
+                                <TabPanel Grid.Row="0" Grid.Column="0"
+                                    Name="HeaderPanel"
+                                    IsItemsHost="True"
+                                    Margin="0 0 0 400"
+                                    KeyboardNavigation.TabIndex="1"
+                                    Panel.ZIndex="1"
+                                    Background="Transparent"/>
+
+                                <!-- Protein/RNA Toggle Control -->
+                                <local:ProteinRnaImageToggle Grid.Row="1" Grid.Column="0" Width="100" />
+
+                                <!-- Content Panel -->
+                                <ContentPresenter
+                                    Name="PART_SelectedContentHost"
+                                    Margin="4 0 0 0 "
+                                    Grid.Row="0"
+                                    Grid.RowSpan="2"
+                                    Grid.Column="1"
+                                    ContentSource="SelectedContent"/>
+                            </Grid>
+                        </ControlTemplate>
+                    </Setter.Value>
+                </Setter>
+                <Style.Triggers>
+                    <DataTrigger Binding="{Binding Source={x:Static guiFunctions:GuiGlobalParamsViewModel.Instance}, Path=IsRnaMode}" Value="True">
+                        <Setter Property="Background" Value="{StaticResource RnaSideBarMainColor}"/>
+                        <Setter Property="BorderBrush" Value="{StaticResource RnaSideBarMainColor}"/>
+                    </DataTrigger>
+                </Style.Triggers>
+            </Style>
             <!--Styling for the tab items on the left side-->
             <Style x:Key="TabItemStyle" TargetType="TabItem">
+                <Setter Property="Background" Value="{StaticResource SideBarMainColor}"/>
+                <Setter Property="BorderBrush" Value="{StaticResource AccentColor}"/>
                 <Setter Property="Template">
                     <Setter.Value>
                         <ControlTemplate TargetType="TabItem">
-                            <Grid Height="55" Width="165" Background="{StaticResource SideBarMainColor}">
+                            <Grid Height="45" Width="165" Background="{TemplateBinding Background}">
                                 <Border Name="Border" Margin="0,0,0,0" Background="Transparent"
-                                                BorderThickness="{TemplateBinding BorderThickness}" BorderBrush="{TemplateBinding BorderBrush}" >
+                                        BorderThickness="{TemplateBinding BorderThickness}"
+                                        BorderBrush="{Binding BorderBrush, RelativeSource={RelativeSource TemplatedParent}}">
                                     <ContentPresenter 
-                                                x:Name="ContentSite" 
-                                                VerticalAlignment="Center"
-                                                HorizontalAlignment="Left"
-                                                ContentSource="Header" Margin="5,2,10,2"
-                                                RecognizesAccessKey="True">
+                                        x:Name="ContentSite" 
+                                        VerticalAlignment="Center"
+                                        HorizontalAlignment="Left"
+                                        ContentSource="Header" Margin="5,2,0,2"
+                                        RecognizesAccessKey="True">
                                     </ContentPresenter>
                                 </Border>
                             </Grid>
@@ -223,14 +276,10 @@
                                 <Trigger Property="IsSelected" Value="True">
                                     <Setter Property="BorderThickness" Value="0,0,7,0"/>
                                     <Setter Property="FontWeight" Value="Bold"/>
-                                    <!--Color of tab item text (when selected)-->
                                     <Setter Property="Foreground" Value="{StaticResource TextColor2}"/>
-                                    <!--Color of tab item right side (when selected)-->
-                                    <Setter Property="BorderBrush" Value="{StaticResource AccentColor}"/>
                                 </Trigger>
 
                                 <Trigger Property="IsSelected" Value="False">
-                                    <!--Color of tab item text (when deselected)-->
                                     <Setter Property="Foreground" Value="{StaticResource TextColor2}"/>
                                 </Trigger>
                             </ControlTemplate.Triggers>
@@ -241,6 +290,12 @@
                 <Setter Property="BorderThickness" Value="0" />
                 <Setter Property="Margin" Value="0,0,2,0" />
                 <Setter Property="Padding" Value="0" />
+                <Style.Triggers>
+                    <DataTrigger Binding="{Binding Source={x:Static guiFunctions:GuiGlobalParamsViewModel.Instance}, Path=IsRnaMode}" Value="True">
+                        <Setter Property="Background" Value="{DynamicResource RnaSideBarMainColor}"/>
+                        <Setter Property="BorderBrush" Value="{DynamicResource RnaAccentColor}"/>
+                    </DataTrigger>
+                </Style.Triggers>
             </Style>
             <Style x:Key="SpacerTabItemStyle" TargetType="TabItem">
                 <Setter Property="Template">
@@ -275,12 +330,17 @@
             <ColumnDefinition Width="0*"/>
             <ColumnDefinition/>
         </Grid.ColumnDefinitions>
-        <TabControl Grid.ColumnSpan="4" TabStripPlacement="Left" BorderThickness="0" BorderBrush="{StaticResource BorderColor}">
+        <TabControl Grid.ColumnSpan="4" TabStripPlacement="Left" BorderThickness="0" BorderBrush="{StaticResource BorderColor}" Style="{StaticResource TabControlStyle}">
             <TabControl.Resources>
                 <Style TargetType="Grid">
                     <!--This defines the *default* style for *all grids in the entire tab control*-->
                     <!--This is not great but seems necessary to have a proper background on the tab items...-->
                     <Setter Property="Background" Value="{StaticResource SideBarMainColor}" />
+                    <Style.Triggers>
+                        <DataTrigger Binding="{Binding Source={x:Static guiFunctions:GuiGlobalParamsViewModel.Instance}, Path=IsRnaMode}" Value="True">
+                            <Setter Property="Background" Value="{StaticResource RnaSideBarMainColor}"/>
+                        </DataTrigger>
+                    </Style.Triggers>
                 </Style>
             </TabControl.Resources>
             <TabItem Header="About" Style="{StaticResource TabItemStyle}">
