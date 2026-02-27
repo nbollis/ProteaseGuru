@@ -19,7 +19,8 @@
         <local:SelectedProteaseToBackgroundConverter x:Key="SelectedProteaseToBackgroundConverter" />
     </UserControl.Resources>
 
-    <Border BorderBrush="{StaticResource BorderColor}" BorderThickness="1" 
+    <Border BorderBrush="{StaticResource BorderColor}" BorderThickness="1"
+            Visibility="{Binding IsVisible, Converter={StaticResource BoolToVisibilityConverter}}"
             Background="{Binding IsSelected, Converter={StaticResource SelectedProteaseToBackgroundConverter}}"
             Margin="5,2,5,2" Padding="2" CornerRadius="10">
         <Grid Background="{Binding IsSelected, Converter={StaticResource SelectedProteaseToBackgroundConverter}}">

@@ -4,6 +4,7 @@ using Engine;
 using Omics.Modifications;
 using Proteomics.ProteolyticDigestion;
 using Tasks;
+using Transcriptomics.Digestion;
 
 namespace GuiFunctions;
 
@@ -21,7 +22,7 @@ public class DigestionConditionsSetupViewModel : BaseViewModel
         {
             _parameters.ProteaseSpecificParameters.Clear();
             foreach (var specificParams in ProteaseSpecificParameters)
-                if (specificParams.IsSelected)
+                if (specificParams.IsSelected && specificParams.IsVisible)
                     _parameters.ProteaseSpecificParameters.Add(specificParams.ProteaseSpecificParams);
             return _parameters;
         }
@@ -56,7 +57,7 @@ public class DigestionConditionsSetupViewModel : BaseViewModel
         set
         {
             _maxMissedCleavages = value;
-            foreach (var proteaseSpecific in ProteaseSpecificParameters)
+            foreach (var proteaseSpecific in ProteaseSpecificParameters.Where(p => p.IsVisible))
                 proteaseSpecific.MaxMissedCleavages = value;
             OnPropertyChanged(nameof(MaxMissedCleavages));
         }
@@ -68,7 +69,7 @@ public class DigestionConditionsSetupViewModel : BaseViewModel
         set
         {
             _minLength = value;
-            foreach (var proteaseSpecific in ProteaseSpecificParameters)
+            foreach (var proteaseSpecific in ProteaseSpecificParameters.Where(p => p.IsVisible))
                 proteaseSpecific.MinLength = value;
             OnPropertyChanged(nameof(MinLength));
         }
@@ -80,7 +81,7 @@ public class DigestionConditionsSetupViewModel : BaseViewModel
         set
         {
             _maxLength = value;
-            foreach (var proteaseSpecific in ProteaseSpecificParameters)
+            foreach (var proteaseSpecific in ProteaseSpecificParameters.Where(p => p.IsVisible))
                 proteaseSpecific.MaxLength = value;
             OnPropertyChanged(nameof(MaxLength));
         }
@@ -123,7 +124,7 @@ public class DigestionConditionsSetupViewModel : BaseViewModel
         set
         {
             _applyFixedCarbamidomethylation = value;
-            foreach (var specificParams in ProteaseSpecificParameters.Where(p => !p.ProteaseSpecificParams.FixedMods.Contains(Carbamidomethylation)))
+            foreach (var specificParams in ProteaseSpecificParameters.Where(p => p.IsVisible && !p.ProteaseSpecificParams.FixedMods.Contains(Carbamidomethylation)))
             {
                 specificParams.ProteaseSpecificParams.FixedMods.Add(Carbamidomethylation);
             }
@@ -138,7 +139,7 @@ public class DigestionConditionsSetupViewModel : BaseViewModel
         set
         {
             _applyVariableOxidation = value;
-            foreach (var specificParams in ProteaseSpecificParameters.Where(p => !p.ProteaseSpecificParams.VariableMods.Contains(OxidativeMethionine)))
+            foreach (var specificParams in ProteaseSpecificParameters.Where(p => p.IsVisible && !p.ProteaseSpecificParams.VariableMods.Contains(OxidativeMethionine)))
             {
                 specificParams.ProteaseSpecificParams.VariableMods.Add(OxidativeMethionine);
             }
@@ -155,20 +156,31 @@ public class DigestionConditionsSetupViewModel : BaseViewModel
     public ICommand ResetDigestionConditionsCommand { get; }
 
     private string[] _defaultProteases = ["Arg-C", "Arg-N", "chymotrypsin (don't cleave before proline)", "Glu-C", "Glu-C (with asp)", "Lys-N"];
+    private string[] _defaultRnases = ["RNase T1", "RNase_MC1", "Cusativin"];
 
     private void SetDefaultProteases()
     {
-        // Select the 6 most commonly used proteases (indices 0, 1, 2, 6, 7, 10 from old code)
-        foreach (var specificParametersViewModel in ProteaseSpecificParameters)
+        if (GuiGlobalParamsViewModel.Instance.IsRnaMode)
         {
-            specificParametersViewModel.IsSelected = _defaultProteases.Contains(specificParametersViewModel.DigestionAgentName);
+            foreach (var specificParametersViewModel in ProteaseSpecificParameters.Where(p => p.IsVisible))
+            {
+                specificParametersViewModel.IsSelected = _defaultRnases.Contains(specificParametersViewModel.DigestionAgentName);
+            }
+        }
+        else
+        {
+            // Select the 6 most commonly used proteases (indices 0, 1, 2, 6, 7, 10 from old code)
+            foreach (var specificParametersViewModel in ProteaseSpecificParameters.Where(p => p.IsVisible))
+            {
+                specificParametersViewModel.IsSelected = _defaultProteases.Contains(specificParametersViewModel.DigestionAgentName);
+            }
         }
     }
 
     private void ClearProteases()
     {
         // Deselect all proteases
-        foreach (var protease in ProteaseSpecificParameters)
+        foreach (var protease in ProteaseSpecificParameters.Where(p => p.IsVisible))
         {
             protease.IsSelected = false;
         }
@@ -186,7 +198,7 @@ public class DigestionConditionsSetupViewModel : BaseViewModel
         ApplyFixedCarbamidomethylation = false;
         ApplyVariableOxidation = false;
 
-        foreach (var specificParametersViewModel in ProteaseSpecificParameters)
+        foreach (var specificParametersViewModel in ProteaseSpecificParameters.Where(p => p.IsVisible))
         {
             specificParametersViewModel.MaxMissedCleavages = MaxMissedCleavages;
             specificParametersViewModel.MinLength = MinLength;
@@ -217,7 +229,18 @@ public class DigestionConditionsSetupViewModel : BaseViewModel
                 var newParamsVM = new ProteaseSpecificParametersViewModel(newParams, this);
                 ProteaseSpecificParameters.Add(newParamsVM);
             }
+        }
 
+        foreach (var rnase in RnaseDictionary.Dictionary)
+        {
+            ProteaseSpecificParametersViewModel? current = ProteaseSpecificParameters.FirstOrDefault(p => p.DigestionAgentName == rnase.Value.Name);
+            if (current == null)
+            {
+                var newDig = new RnaDigestionParams(rnase.Key, MaxMissedCleavages, MinLength, MaxLength);
+                var newParams = new ProteaseSpecificParameters(newDig, null, null);
+                var newParamsVM = new ProteaseSpecificParametersViewModel(newParams, this);
+                ProteaseSpecificParameters.Add(newParamsVM);
+            }
         }
     }
 }

@@ -1056,7 +1056,7 @@ namespace GUI
         private void HandleModeSwitchConfirmation(object sender, ModeSwitchRequestEventArgs e)
         {
             // No files loaded, just return and switch modes
-            if (ParametersViewModel.ProteaseSpecificParameters.Count(p => p.IsSelected) == 0 && ProteinDbObservableCollection.IsNullOrEmpty())
+            if (ParametersViewModel.ProteaseSpecificParameters.Count(p => p is { IsSelected: true, IsVisible: true }) == 0 && ProteinDbObservableCollection.IsNullOrEmpty())
             {
                 e.Result = ModeSwitchResult.SwitchKeepFiles;
                 return;
