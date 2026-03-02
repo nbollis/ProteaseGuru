@@ -184,22 +184,22 @@
                 <Button Grid.Column="0" x:Name="defaultProteasesButton" Width="130"
                             Command="{Binding SetDefaultProteasesCommand}"  Style="{StaticResource ImportantButtonStyle}">
                     <Button.Content>
-                        <Binding Converter="{StaticResource ProtTermConverter}"  Source="{x:Static guiFunctions:GuiGlobalParamsViewModel.Instance}" Path ="IsRnaMode"
+                        <Binding Converter="{StaticResource ProtTermConverter}" Source="{x:Static guiFunctions:GuiGlobalParamsViewModel.Instance}" Path ="IsRnaMode"
                                  ConverterParameter="Default Proteases"/>
                     </Button.Content>
                 </Button>
                 <Button Grid.Column="2" x:Name="clearProteasesButton" Width="150"
                             Command="{Binding ClearProteasesCommand}"  Style="{StaticResource ImportantButtonStyle}">
                     <Button.Content>
-                        <Binding Converter="{StaticResource ProtTermConverter}"  Source="{x:Static guiFunctions:GuiGlobalParamsViewModel.Instance}" Path ="IsRnaMode"
+                        <Binding Converter="{StaticResource ProtTermConverter}" Source="{x:Static guiFunctions:GuiGlobalParamsViewModel.Instance}" Path ="IsRnaMode"
                                  ConverterParameter="Clear Protease Selection"/>
                     </Button.Content>
                 </Button>
                 <Button Grid.Column="4" x:Name="addCustomProteasesButton" Width="130"
-                        Visibility="{Binding Converter={StaticResource CollapseOnRna}}"
+                        Visibility="{Binding Converter={StaticResource CollapseOnRna}, Source={x:Static guiFunctions:GuiGlobalParamsViewModel.Instance}, Path=IsRnaMode}"
                         Click="AddCustomProtease_Click"  Style="{StaticResource ImportantButtonStyle}">
                     <Button.Content>
-                        <Binding Converter="{StaticResource ProtTermConverter}"  Source="{x:Static guiFunctions:GuiGlobalParamsViewModel.Instance}" Path ="IsRnaMode"
+                        <Binding Converter="{StaticResource ProtTermConverter}" Source="{x:Static guiFunctions:GuiGlobalParamsViewModel.Instance}" Path ="IsRnaMode"
                                  ConverterParameter="Add Custom Protease"/>
                     </Button.Content>
                 </Button>

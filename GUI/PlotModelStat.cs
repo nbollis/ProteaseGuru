@@ -6,6 +6,7 @@ using System.Globalization;
 using System.Linq;
 using System.Windows;
 using Engine;
+using GuiFunctions;
 using Omics;
 using OxyPlot;
 using OxyPlot.Axes;
@@ -329,37 +330,56 @@ namespace GUI
             privateModel.DefaultColors = columnColors;
         }
 
+        private static string NormalizePlotName(string plotType)
+        {
+            // Map RNA terminology back to protein terminology for consistent plot handling
+            return plotType.Trim() switch
+            {
+                "Oligo Length" => " Peptide Length",
+                "Transcript Sequence Coverage" => " Protein Sequence Coverage",
+                "Transcript Sequence Coverage (Unique Oligos Only)" => " Protein Sequence Coverage (Unique Peptides Only)",
+                "Number of Unique Oligos per Transcript" => " Number of Unique Peptides per Protein",
+                "Predicted Oligo Hydrophobicity" => " Predicted Peptide Hydrophobicity",
+                "Predicted Oligo Electrophoretic Mobility" => " Predicted Peptide Electrophoretic Mobility",
+                "Nucleotide Distribution" => " Amino Acid Distribution",
+                _ => plotType
+            };
+        }
+
         private void createPlot(string plotType)
         {
-            if (plotType.Equals(" Peptide Length"))
+            // Normalize plot name to handle both protein and RNA terminology
+            string normalizedPlotType = NormalizePlotName(plotType);
+
+            if (normalizedPlotType.Equals(" Peptide Length"))
             {
                 histogramPlot(1);
             }
-            else if (plotType.Equals(" Protein Sequence Coverage"))
+            else if (normalizedPlotType.Equals(" Protein Sequence Coverage"))
             {
                 histogramPlot(2);
             }
-            else if (plotType.Equals(" Protein Sequence Coverage (Unique Peptides Only)"))
+            else if (normalizedPlotType.Equals(" Protein Sequence Coverage (Unique Peptides Only)"))
             {
                 histogramPlot(3);
             }
-            else if (plotType.Equals(" Number of Unique Peptides per Protein"))
+            else if (normalizedPlotType.Equals(" Number of Unique Peptides per Protein"))
             {
                 histogramPlot(4);
             }
-            else if (plotType.Equals(" Predicted Peptide Hydrophobicity"))
+            else if (normalizedPlotType.Equals(" Predicted Peptide Hydrophobicity"))
             {
                 histogramPlot(5);
             }
-            else if (plotType.Equals(" Predicted Peptide Electrophoretic Mobility"))
+            else if (normalizedPlotType.Equals(" Predicted Peptide Electrophoretic Mobility"))
             {
                 histogramPlot(6);
             }
-            else if (plotType.Equals(" Chronologer Predicted Retention Time"))
+            else if (normalizedPlotType.Equals(" Chronologer Predicted Retention Time"))
             {
                 histogramPlot(7);
             }
-            else if (plotType.Equals(" Amino Acid Distribution"))
+            else if (normalizedPlotType.Equals(" Amino Acid Distribution"))
             {
                 columnPlot();
             }
@@ -415,9 +435,9 @@ namespace GUI
             privateModel.TitleFontSize = 15;
 
             string yAxisTitle = "Count";
-            string xAxisTitle = "Amino Acid";
+            string xAxisTitle = GuiGlobalParamsViewModel.Instance.IsRnaMode ? "Nucleotide" : "Amino Acid";
             Dictionary<string, Dictionary<char, int>> dictsByProtease = new();
-            List<char> aminoAcids = new List<char>() { 'A', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'K', 'L', 'M', 'N', 'P', 'Q', 'R', 'S', 'T', 'V', 'W', 'Y' };
+            List<char> aminoAcids = PeptidesByProtease.Values.SelectMany(p => p.SelectMany(peptide => peptide.BaseSequence)).Distinct().OrderBy(aa => aa).ToList();
             foreach (var protease in PeptidesByProtease)
             {
                 Dictionary<char, int> aminoAcidCount = new Dictionary<char, int>();

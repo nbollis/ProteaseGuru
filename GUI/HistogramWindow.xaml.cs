@@ -105,6 +105,22 @@ namespace GUI
 
         }
         
+        private static string NormalizePlotName(string plotType)
+        {
+            // Map RNA terminology back to protein terminology for consistent plot handling
+            return plotType.Trim() switch
+            {
+                "Oligo Length" => " Peptide Length",
+                "Transcript Sequence Coverage" => " Protein Sequence Coverage",
+                "Transcript Sequence Coverage (Unique Oligos Only)" => " Protein Sequence Coverage (Unique Peptides Only)",
+                "Number of Unique Oligos per Transcript" => " Number of Unique Peptides per Protein",
+                "Predicted Oligo Hydrophobicity" => " Predicted Peptide Hydrophobicity",
+                "Predicted Oligo Electrophoretic Mobility" => " Predicted Peptide Electrophoretic Mobility",
+                "Nucleotide Distribution" => " Amino Acid Distribution",
+                _ => plotType
+            };
+        }
+
         //determine which histogram the user wants to make and what peptides should be used to make it
         private async void PlotSelected(object sender, SelectionChangedEventArgs e)
         {
@@ -137,7 +153,13 @@ namespace GUI
             progressBar.IsIndeterminate = false;
             //send the plot to GUI            
             plotViewStat.DataContext = plot;
-            plotViewStat.Model.Axes[1].AbsoluteMinimum = 0;            
+            
+            // Safely access axes only if they exist
+            if (plotViewStat.Model?.Axes != null && plotViewStat.Model.Axes.Count > 1)
+            {
+                plotViewStat.Model.Axes[1].AbsoluteMinimum = 0;
+            }
+            
             //send the data table with plot info to GUI for export if desired
             HistogramDataTable = plot.DataTable;
             HistogramLoading.Items.Clear();
@@ -246,7 +268,11 @@ namespace GUI
             }
             double binSize = 0;
             double maxValue = 0;
-            switch (SelectedPlot)
+            
+            // Normalize plot name to handle both protein and RNA terminology
+            string normalizedPlot = NormalizePlotName(SelectedPlot);
+            
+            switch (normalizedPlot)
             {               
                 case " Protein Sequence Coverage": // Protein Sequence Coverage                    
                     binSize = 0.01;
