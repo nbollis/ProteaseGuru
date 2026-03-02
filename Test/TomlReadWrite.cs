@@ -86,8 +86,9 @@ public class TomlReadWrite
 
         var globalParams = new GlobalParameters()
         {
-            IsRnaMode = true,
-            RunParameters = original
+            RunParameters = original,
+            AskAboutSettingsChangeOnClose = false,
+            OverwriteSettingsWithoutAsking = true
         };
 
         var path = Path.Combine(Path.GetTempPath(), "test_parameters.toml");
@@ -112,7 +113,8 @@ public class TomlReadWrite
             Assert.That(deserializedParams.VariableMods.Select(m => m.IdWithMotif), Is.EquivalentTo(originalParams.VariableMods.Select(m => m.IdWithMotif)));
         }
 
-        Assert.That(deserialized.IsRnaMode, Is.EqualTo(globalParams.IsRnaMode));
+        Assert.That(deserialized.AskAboutSettingsChangeOnClose, Is.EqualTo(globalParams.AskAboutSettingsChangeOnClose));
+        Assert.That(deserialized.OverwriteSettingsWithoutAsking, Is.EqualTo(globalParams.OverwriteSettingsWithoutAsking));
 
         File.Delete(path);
     }

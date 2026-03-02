@@ -13,7 +13,7 @@ using Tasks;
 namespace Test;
 internal class Parameters
 {
-    private static string SettingsPath => GlobalParameters.DefaultGlobalParametersFilePath;
+    private static string SettingsPath => GuiGlobalParamsViewModel.DefaultGlobalParametersFilePath;
 
     [SetUp]
     public void SetUp()
@@ -54,8 +54,9 @@ internal class Parameters
         // Clear static event handlers to prevent cross-test contamination
         var requestModeSwitchField = typeof(GuiGlobalParamsViewModel)
             .GetProperty("RequestModeSwitchConfirmation", BindingFlags.Public | BindingFlags.Static);
-        requestModeSwitchField.SetValue(null, null);
+        requestModeSwitchField?.SetValue(null, null);
     }
+
     [Test]
     public void BooleanProperties_SetAndGet_TriggerPropertyChanged()
     {
@@ -71,8 +72,6 @@ internal class Parameters
             if (prop.PropertyType != typeof(bool)) continue;
             if (!prop.CanRead || !prop.CanWrite) continue;
             if (prop.GetIndexParameters().Length > 0) continue;
-            // Skip IsRnaMode as it has special behavior tested separately
-            if (prop.Name == nameof(GuiGlobalParamsViewModel.IsRnaMode)) continue;
 
             testedCount++;
 

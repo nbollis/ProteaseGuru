@@ -85,7 +85,7 @@ namespace GUI
         {
             Microsoft.Win32.OpenFileDialog openPicker = new Microsoft.Win32.OpenFileDialog()
             {
-                Filter = "Results Files|*.txt",
+                Filter = "Results Files|*.toml",
                 FilterIndex = 1,
                 RestoreDirectory = true,
                 Multiselect = true
@@ -94,9 +94,9 @@ namespace GUI
             {
                 foreach (var filepath in openPicker.FileNames.OrderBy(p => p))
                 {
-                    if (System.IO.Path.GetExtension(filepath) != ".txt")
+                    if (System.IO.Path.GetExtension(filepath) != ".toml")
                     {
-                        MessageBox.Show("Error: Only ProteaseGuru digestion parameters in .txt format should be loaded here. Please remove '" + filepath + "' before proceeding with analysis");
+                        MessageBox.Show("Error: Only ProteaseGuru digestion parameters in .toml format should be loaded here. Please remove '" + filepath + "' before proceeding with analysis");
                         return;
                     }
                     else
@@ -202,7 +202,7 @@ namespace GUI
                         ResultsObservableCollection.Add(file);
                     }
                     break;
-                case ".txt":
+                case ".toml":
                     ParametersForDataGrid parameters = new ParametersForDataGrid(draggedFilePath);
                     if (!ParametersFileExists(ParametersObservableCollection, parameters))
                     {
@@ -573,61 +573,18 @@ namespace GUI
 
             RunParameters loadedParams = new RunParameters();
 
-            string proteaseDirectory = System.IO.Path.Combine(GlobalVariables.DataDir, @"ProteolyticDigestion");
-            string proteaseFilePath = System.IO.Path.Combine(proteaseDirectory, @"proteases.tsv");
-            var myLines = File.ReadAllLines(proteaseFilePath);
-            myLines = myLines.Skip(1).ToArray();
-            Dictionary<string, Protease> dict = new Dictionary<string, Protease>();
-            foreach (string line in myLines)
-            {
-                if (line.Trim() != string.Empty) // skip empty lines
-                {
-                    string[] fields = line.Split('\t');
-                    List<DigestionMotif> motifList = DigestionMotif.ParseDigestionMotifsFromString(fields[1]);
-
-                    string name = fields[0];
-                    var cleavageSpecificity = ((CleavageSpecificity)Enum.Parse(typeof(CleavageSpecificity), fields[4], true));
-                    string psiMsAccessionNumber = fields[5];
-                    string psiMsName = fields[6];
-                    var protease = new Protease(name, cleavageSpecificity, psiMsAccessionNumber, psiMsName, motifList);
-                    dict.Add(protease.Name, protease);
-                }
-            }
-
+            // Load parameters from TOML files
             foreach (var parameterFile in ParametersObservableCollection)
             {
-                var fileData = File.ReadAllLines(parameterFile.FilePath);
-                List<string> proteaseNames = new List<string>();
-                int missedCleavages = 0;
-                int minPeptideLength = 0;
-                int maxPeptideLength = 0;
-                bool treatModPeps = false;
-                int minPeptideMass = -1;
-                int maxPeptideMass = -1;
-
-                foreach (var parameter in fileData)
+                try
                 {
-                    var info = parameter.Split(": ");
-                    switch (info[0])
-                    {
-                        case "Digestion Conditions:":
-                            break;
-                        case "Proteases":
-                            proteaseNames = info[1].Split(",").Select(p => p.Trim()).ToList();
-                            break;
-                        case "Missed Cleavages":
-                            missedCleavages = Convert.ToInt32(info[1]);
-                            break;
-                        case "Min Peptide Length":
-                            minPeptideLength = Convert.ToInt32(info[1]);
-                            break;
-                        case "Max Peptide Length":
-                            maxPeptideLength = Convert.ToInt32(info[1]);
-                            break;
-                        case "Treat modified peptides as different peptides":
-                            if (info[1] == "True")
-                            {
-                                treatModPeps = true;
+                    loadedParams = RunParameters.FromToml(parameterFile.FilePath);
+                    break; // Use the first valid parameter file
+                }
+                catch (Exception ex)
+            {
+                    MessageBox.Show($"Error loading parameters from {parameterFile.FileName}: {ex.Message}");
+                    return;
                             }
                             break;
                         case "Min Peptide Mass":
@@ -642,25 +599,11 @@ namespace GUI
                     }
                 }
 
-                // Create ProteaseSpecificParameters for each protease
-                foreach (var proteaseName in proteaseNames)
+            // If no parameters were loaded, show error and return
+            if (!loadedParams.ProteaseSpecificParameters.Any())
                 {
-                    if (dict.ContainsKey(proteaseName))
-                    {
-                        DigestionParams digestionParams = new DigestionParams(
-                            protease: proteaseName,
-                            maxMissedCleavages: missedCleavages,
-                            minPeptideLength: minPeptideLength,
-                            maxPeptideLength: maxPeptideLength);
-
-                        loadedParams.ProteaseSpecificParameters.Add(
-                            new ProteaseSpecificParameters(digestionParams));
-                    }
-                }
-
-                loadedParams.TreatModifiedPeptidesAsDifferent = treatModPeps;
-                loadedParams.MinPeptideMassAllowed = minPeptideMass;
-                loadedParams.MaxPeptideMassAllowed = maxPeptideMass;
+                MessageBox.Show("Error: No valid parameters could be loaded from the provided files.");
+                return;
             }
 
             List<InSilicoPep> allpeptides = new List<InSilicoPep>();
