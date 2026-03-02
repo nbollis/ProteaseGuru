@@ -202,20 +202,26 @@ public class DigestionConditionsSetupViewModel : BaseViewModel
 
     public void PopulateProteaseCollection()
     {
-        string proteaseDirectory = System.IO.Path.Combine(GlobalVariables.DataDir, @"ProteolyticDigestion");
-        string proteaseFilePath = System.IO.Path.Combine(proteaseDirectory, @"proteases.tsv");
-        Dictionary<string, Protease> dict = ProteaseDictionary.LoadProteaseDictionary(proteaseFilePath, GlobalVariables.ProteaseMods);
-
+        var dict = ProteaseDictionary.Dictionary;
         foreach (var protease in dict)
         {
             ProteaseSpecificParametersViewModel? current = ProteaseSpecificParameters.FirstOrDefault(p => p.DigestionAgentName == protease.Value.Name);
+
+            bool shouldSelect = _parameters.ProteaseSpecificParameters.Any(p => p.DigestionParams.DigestionAgent.Name == protease.Value.Name);
 
             if (current == null)
             {
                 var newDig = new DigestionParams(protease.Key, MaxMissedCleavages, MinLength, MaxLength);
                 var newParams = new ProteaseSpecificParameters(newDig, null, null);
-                var newParamsVM = new ProteaseSpecificParametersViewModel(newParams, this);
+                var newParamsVM = new ProteaseSpecificParametersViewModel(newParams, this)
+                {
+                    IsSelected = shouldSelect
+                };
                 ProteaseSpecificParameters.Add(newParamsVM);
+            }
+            else
+            {
+                current.IsSelected = shouldSelect;
             }
 
         }

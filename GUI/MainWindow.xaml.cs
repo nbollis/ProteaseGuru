@@ -1,25 +1,14 @@
 using Proteomics;
-using System;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System.ComponentModel;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
-using System.Windows.Shapes;
 using Engine;
 using Tasks;
 using Proteomics.ProteolyticDigestion;
 using System.IO;
 using System.Globalization;
-using static Tasks.ProteaseGuruTask;
 using MzLibUtil;
 using System.Diagnostics;
 using Omics.Digestion;
@@ -46,10 +35,8 @@ namespace GUI
         public MainWindow()
         {
             InitializeComponent();
-            Title = "ProteaseGuru: Version " + GlobalVariables.ProteaseGuruVersion;
 
-            // TODO: Set up default parameters to check for
-            ParametersViewModel = new(new RunParameters());
+            ParametersViewModel = new(GuiGlobalParamsViewModel.Instance.DefaultRunParameters);
             digestionConditionsControl.DataContext = ParametersViewModel;
           
             dataGridProteinDatabases.DataContext = ProteinDbObservableCollection;
@@ -1044,5 +1031,12 @@ namespace GUI
         //{
         //    GlobalVariables.StartProcess(@"https://www.youtube.com/channel/UCwPeeXcYSQBdbfXt-SdYhEg");
         //}
+        private void Window_Closing(object? sender, CancelEventArgs e)
+        {
+            if (GuiGlobalParamsViewModel.Instance.IsDirty())
+            {
+                GuiGlobalParamsViewModel.Instance.Save();
+            }
+        }
     }
 }

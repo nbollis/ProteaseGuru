@@ -87,7 +87,7 @@ public class TomlReadWrite
         var globalParams = new GlobalParameters()
         {
             IsRnaMode = true,
-            DefaultParameters = original
+            RunParameters = original
         };
 
         var path = Path.Combine(Path.GetTempPath(), "test_parameters.toml");
@@ -97,16 +97,16 @@ public class TomlReadWrite
         Assert.That(File.ReadAllText(path).Length, Is.GreaterThan(0));
 
         var deserialized = GlobalParameters.FromToml(path);
-        Assert.That(deserialized.DefaultParameters.OutputFolder, Is.EqualTo(original.OutputFolder));
-        Assert.That(deserialized.DefaultParameters.TreatModifiedPeptidesAsDifferent, Is.EqualTo(original.TreatModifiedPeptidesAsDifferent));
-        Assert.That(deserialized.DefaultParameters.MinPeptideMassAllowed, Is.EqualTo(original.MinPeptideMassAllowed));
-        Assert.That(deserialized.DefaultParameters.MaxPeptideMassAllowed, Is.EqualTo(original.MaxPeptideMassAllowed));
-        Assert.That(deserialized.DefaultParameters.ProteaseSpecificParameters.Count, Is.EqualTo(original.ProteaseSpecificParameters.Count));
+        Assert.That(deserialized.RunParameters.OutputFolder, Is.EqualTo(original.OutputFolder));
+        Assert.That(deserialized.RunParameters.TreatModifiedPeptidesAsDifferent, Is.EqualTo(original.TreatModifiedPeptidesAsDifferent));
+        Assert.That(deserialized.RunParameters.MinPeptideMassAllowed, Is.EqualTo(original.MinPeptideMassAllowed));
+        Assert.That(deserialized.RunParameters.MaxPeptideMassAllowed, Is.EqualTo(original.MaxPeptideMassAllowed));
+        Assert.That(deserialized.RunParameters.ProteaseSpecificParameters.Count, Is.EqualTo(original.ProteaseSpecificParameters.Count));
 
         for (int i = 0; i < original.ProteaseSpecificParameters.Count; i++)
         {
             var originalParams = original.ProteaseSpecificParameters[i];
-            var deserializedParams = deserialized.DefaultParameters.ProteaseSpecificParameters[i];
+            var deserializedParams = deserialized.RunParameters.ProteaseSpecificParameters[i];
             Assert.That(deserializedParams.DigestionAgentName, Is.EqualTo(originalParams.DigestionAgentName));
             Assert.That(deserializedParams.FixedMods.Select(m => m.IdWithMotif), Is.EquivalentTo(originalParams.FixedMods.Select(m => m.IdWithMotif)));
             Assert.That(deserializedParams.VariableMods.Select(m => m.IdWithMotif), Is.EquivalentTo(originalParams.VariableMods.Select(m => m.IdWithMotif)));
