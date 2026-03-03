@@ -36,7 +36,7 @@ namespace GUI
         {
             InitializeComponent();
 
-            ParametersViewModel = new(GuiGlobalParamsViewModel.Instance.DefaultRunParameters);
+            ParametersViewModel = new(new());
             digestionConditionsControl.DataContext = ParametersViewModel;
           
             dataGridProteinDatabases.DataContext = ProteinDbObservableCollection;
@@ -205,12 +205,10 @@ namespace GUI
                 case ".toml":
                     try
                     {
-                        // Load parameters into the global view model (maintains references)
-                        GuiGlobalParamsViewModel.Instance.LoadParametersFromFile(draggedFilePath);
-                        
+                        var loadedParams = RunParameters.FromToml(draggedFilePath);
+
                         // Reload the ViewModel's UI values from the updated parameters
-                        ParametersViewModel.LoadFromParameters();
-                        ParametersViewModel.PopulateProteaseCollection();
+                        ParametersViewModel.LoadFromParameters(loadedParams);
 
                         ParametersForDataGrid parameters = new ParametersForDataGrid(draggedFilePath);
                         if (!ParametersFileExists(ParametersObservableCollection, parameters))
@@ -978,42 +976,5 @@ namespace GUI
         //{
         //    GlobalVariables.StartProcess(@"https://www.youtube.com/channel/UCwPeeXcYSQBdbfXt-SdYhEg");
         //}
-        private void Window_Closing(object? sender, CancelEventArgs e)
-        {
-            if (GuiGlobalParamsViewModel.Instance.IsDirty())
-            {
-                if (GuiGlobalParamsViewModel.Instance.OverwriteSettingsWithoutAsking)
-                {
-                    GuiGlobalParamsViewModel.Instance.Save();
-                }
-                else if (GuiGlobalParamsViewModel.Instance.AskAboutSettingsChangesOnClose)
-                {
-                    var result = ExitMsgBox.Show("Unsaved Changes", "You have unsaved changes to your global settings. Do you want to save before exiting?", "Yes", "No", "Yes and don't ask again", "No and don't ask again");
-
-                    if (result == MessageBoxResult.Yes)
-                    {
-                        GuiGlobalParamsViewModel.Instance.Save();
-                    }
-                    else if (result == MessageBoxResult.No)
-                    {
-                        // do nothing, just exit
-                    }
-                    // Yes and don't ask
-                    else if (result == MessageBoxResult.OK)
-                    {
-                        GuiGlobalParamsViewModel.Instance.OverwriteSettingsWithoutAsking = true;
-                        GuiGlobalParamsViewModel.Instance.AskAboutSettingsChangesOnClose = false;
-                        GuiGlobalParamsViewModel.Instance.Save();
-                    }
-                    // No and don't ask
-                    else if (result == MessageBoxResult.Cancel)
-                    {
-                        GuiGlobalParamsViewModel.Instance.OverwriteSettingsWithoutAsking = false;
-                        GuiGlobalParamsViewModel.Instance.AskAboutSettingsChangesOnClose = false;
-                        GuiGlobalParamsViewModel.Instance.Save();
-                    }
-                }
-            }
-        }
     }
 }

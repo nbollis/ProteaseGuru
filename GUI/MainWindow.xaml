@@ -9,8 +9,7 @@
         Drop="Window_Drop" AllowDrop="true" 
         WindowStartupLocation="CenterScreen"
         Icon="proteaseGuru.ico"
-        Closing="Window_Closing"
-        Title="{Binding Source={x:Static guiFunctions:GuiGlobalParamsViewModel.Instance}, Path=MainWindowTitle}"
+        Title="Protease Guru"
         Height="600" Width="1300">
     <Window.Resources>
         <ResourceDictionary>
