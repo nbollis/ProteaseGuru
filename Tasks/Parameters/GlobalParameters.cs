@@ -2,6 +2,8 @@ namespace Tasks;
 public class GlobalParameters : ParameterBaseClass<GlobalParameters>, IEquatable<GlobalParameters>
 {
     public RunParameters RunParameters { get; set; } = new();
+    public bool AskAboutSettingsChangeOnClose { get; set; } = true;
+    public bool OverwriteSettingsWithoutAsking { get; set; } = false;
 
     public GlobalParameters Clone()
     {

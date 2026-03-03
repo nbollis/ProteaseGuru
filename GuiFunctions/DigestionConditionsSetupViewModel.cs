@@ -38,6 +38,9 @@ public class DigestionConditionsSetupViewModel : BaseViewModel
         SetDefaultProteasesCommand = new RelayCommand(SetDefaultProteases);
         ClearProteasesCommand = new RelayCommand(ClearProteases);
         ResetDigestionConditionsCommand = new RelayCommand(ResetDigestionConditions);
+        
+        // Initialize local fields with current parameter values
+        LoadFromParameters();
     }
 
     #region Properties to Set AllSpecificParameters
@@ -59,6 +62,7 @@ public class DigestionConditionsSetupViewModel : BaseViewModel
             foreach (var proteaseSpecific in ProteaseSpecificParameters)
                 proteaseSpecific.MaxMissedCleavages = value;
             OnPropertyChanged(nameof(MaxMissedCleavages));
+            NotifyGlobalParametersChanged();
         }
     }
 
@@ -71,6 +75,7 @@ public class DigestionConditionsSetupViewModel : BaseViewModel
             foreach (var proteaseSpecific in ProteaseSpecificParameters)
                 proteaseSpecific.MinLength = value;
             OnPropertyChanged(nameof(MinLength));
+            NotifyGlobalParametersChanged();
         }
     }
 
@@ -83,6 +88,7 @@ public class DigestionConditionsSetupViewModel : BaseViewModel
             foreach (var proteaseSpecific in ProteaseSpecificParameters)
                 proteaseSpecific.MaxLength = value;
             OnPropertyChanged(nameof(MaxLength));
+            NotifyGlobalParametersChanged();
         }
     }
 
@@ -93,6 +99,7 @@ public class DigestionConditionsSetupViewModel : BaseViewModel
         {
             Parameters.MinPeptideMassAllowed = value;
             OnPropertyChanged(nameof(MinPeptideMass));
+            NotifyGlobalParametersChanged();
         }
     }
 
@@ -103,6 +110,7 @@ public class DigestionConditionsSetupViewModel : BaseViewModel
         {
             Parameters.MaxPeptideMassAllowed = value;
             OnPropertyChanged(nameof(MaxPeptideMass));
+            NotifyGlobalParametersChanged();
         }
     }
 
@@ -114,6 +122,7 @@ public class DigestionConditionsSetupViewModel : BaseViewModel
             _treatModifiedPeptidesAsDifferent = value;
             Parameters.TreatModifiedPeptidesAsDifferent = value;
             OnPropertyChanged(nameof(TreatModifiedPeptidesAsDifferent));
+            NotifyGlobalParametersChanged();
         }
     }
 
@@ -129,6 +138,7 @@ public class DigestionConditionsSetupViewModel : BaseViewModel
             }
 
             OnPropertyChanged(nameof(ApplyFixedCarbamidomethylation));
+            NotifyGlobalParametersChanged();
         }
     }
 
@@ -143,6 +153,7 @@ public class DigestionConditionsSetupViewModel : BaseViewModel
                 specificParams.ProteaseSpecificParams.VariableMods.Add(OxidativeMethionine);
             }
             OnPropertyChanged(nameof(ApplyVariableOxidation));
+            NotifyGlobalParametersChanged();
         }
     }
 
@@ -163,6 +174,7 @@ public class DigestionConditionsSetupViewModel : BaseViewModel
         {
             specificParametersViewModel.IsSelected = _defaultProteases.Contains(specificParametersViewModel.DigestionAgentName);
         }
+        NotifyGlobalParametersChanged();
     }
 
     private void ClearProteases()
@@ -172,6 +184,7 @@ public class DigestionConditionsSetupViewModel : BaseViewModel
         {
             protease.IsSelected = false;
         }
+        NotifyGlobalParametersChanged();
     }
 
     private void ResetDigestionConditions()
@@ -195,6 +208,7 @@ public class DigestionConditionsSetupViewModel : BaseViewModel
         }
         
         ClearProteases();
+        NotifyGlobalParametersChanged();
     }
 
 
@@ -225,5 +239,40 @@ public class DigestionConditionsSetupViewModel : BaseViewModel
             }
 
         }
+    }
+
+    /// <summary>
+    /// Loads current values from the underlying RunParameters into local fields.
+    /// Called when loading a new parameters file.
+    /// </summary>
+    public void LoadFromParameters()
+    {
+        _treatModifiedPeptidesAsDifferent = _parameters.TreatModifiedPeptidesAsDifferent;
+        
+        // Load values from first protease if any exist
+        if (_parameters.ProteaseSpecificParameters.Any())
+        {
+            var firstProtease = _parameters.ProteaseSpecificParameters.First();
+            _maxMissedCleavages = firstProtease.DigestionParams.MaxMissedCleavages;
+            _minLength = firstProtease.DigestionParams.MinLength;
+            _maxLength = firstProtease.DigestionParams.MaxLength;
+        }
+        
+        // Refresh UI
+        OnPropertyChanged(nameof(MaxMissedCleavages));
+        OnPropertyChanged(nameof(MinLength));
+        OnPropertyChanged(nameof(MaxLength));
+        OnPropertyChanged(nameof(MinPeptideMass));
+        OnPropertyChanged(nameof(MaxPeptideMass));
+        OnPropertyChanged(nameof(TreatModifiedPeptidesAsDifferent));
+    }
+
+    /// <summary>
+    /// Notifies the global parameters view model that changes have been made.
+    /// This ensures the dirty flag is properly set for save-on-exit behavior.
+    /// </summary>
+    private void NotifyGlobalParametersChanged()
+    {
+        GuiGlobalParamsViewModel.Instance.NotifyParametersChanged();
     }
 }

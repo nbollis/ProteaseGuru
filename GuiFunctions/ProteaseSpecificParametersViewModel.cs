@@ -21,6 +21,8 @@ public class ProteaseSpecificParametersViewModel(ProteaseSpecificParameters dig,
         {
             _isSelected = value;
             OnPropertyChanged(nameof(IsSelected));
+            // Notify parent that selection changed
+            NotifyParameterChanged();
         }
     }
 
@@ -31,6 +33,7 @@ public class ProteaseSpecificParametersViewModel(ProteaseSpecificParameters dig,
         {
             ProteaseSpecificParams.DigestionParams.MaxMissedCleavages = value;
             OnPropertyChanged(nameof(MaxMissedCleavages));
+            NotifyParameterChanged();
         }
     }
 
@@ -41,6 +44,7 @@ public class ProteaseSpecificParametersViewModel(ProteaseSpecificParameters dig,
         {
             ProteaseSpecificParams.DigestionParams.MinLength = value;
             OnPropertyChanged(nameof(MinLength));
+            NotifyParameterChanged();
         }
     }
 
@@ -51,6 +55,12 @@ public class ProteaseSpecificParametersViewModel(ProteaseSpecificParameters dig,
         {
             ProteaseSpecificParams.DigestionParams.MaxLength = value;
             OnPropertyChanged(nameof(MaxLength));
+            NotifyParameterChanged();
         }
+    }
+
+    private void NotifyParameterChanged()
+    {
+        GuiGlobalParamsViewModel.Instance.NotifyParametersChanged();
     }
 }

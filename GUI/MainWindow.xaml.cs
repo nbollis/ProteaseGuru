@@ -29,7 +29,7 @@ namespace GUI
         private readonly ObservableCollection<ParametersForDataGrid> ParametersObservableCollection = new ObservableCollection<ParametersForDataGrid>();
         private readonly ObservableCollection<RunSummaryForTreeView> SummaryForTreeViewObservableCollection;
 
-        private readonly DigestionConditionsSetupViewModel ParametersViewModel;
+        private DigestionConditionsSetupViewModel ParametersViewModel;
 
         //set up the main window that users interact with
         public MainWindow()
@@ -203,11 +203,26 @@ namespace GUI
                     }
                     break;
                 case ".toml":
-                    ParametersForDataGrid parameters = new ParametersForDataGrid(draggedFilePath);
-                    if (!ParametersFileExists(ParametersObservableCollection, parameters))
+                    try
                     {
-                        ParametersObservableCollection.Add(parameters);
+                        // Load parameters into the global view model (maintains references)
+                        GuiGlobalParamsViewModel.Instance.LoadParametersFromFile(draggedFilePath);
+                        
+                        // Reload the ViewModel's UI values from the updated parameters
+                        ParametersViewModel.LoadFromParameters();
+                        ParametersViewModel.PopulateProteaseCollection();
+
+                        ParametersForDataGrid parameters = new ParametersForDataGrid(draggedFilePath);
+                        if (!ParametersFileExists(ParametersObservableCollection, parameters))
+                        {
+                            ParametersObservableCollection.Add(parameters);
+                        }
                     }
+                    catch (Exception ex)
+                    {
+                        MessageBox.Show($"Error loading parameters.toml with message: {ex.Message}");
+                    }
+
                     break;
                 default:
                     GuiWarnHandler(null, new StringEventArgs("Unrecognized file type: " + theExtension, null));
@@ -582,26 +597,15 @@ namespace GUI
                     break; // Use the first valid parameter file
                 }
                 catch (Exception ex)
-            {
+                {
                     MessageBox.Show($"Error loading parameters from {parameterFile.FileName}: {ex.Message}");
                     return;
-                            }
-                            break;
-                        case "Min Peptide Mass":
-                            minPeptideMass = Convert.ToInt32(info[1]);
-                            break;
-                        case "Max Peptide Mass":
-                            maxPeptideMass = Convert.ToInt32(info[1]);
-                            break;
-                        default:
-                            // Could be protease-specific parameters or unknown
-                            break;
-                    }
                 }
+            }
 
             // If no parameters were loaded, show error and return
             if (!loadedParams.ProteaseSpecificParameters.Any())
-                {
+            {
                 MessageBox.Show("Error: No valid parameters could be loaded from the provided files.");
                 return;
             }
@@ -978,7 +982,37 @@ namespace GUI
         {
             if (GuiGlobalParamsViewModel.Instance.IsDirty())
             {
-                GuiGlobalParamsViewModel.Instance.Save();
+                if (GuiGlobalParamsViewModel.Instance.OverwriteSettingsWithoutAsking)
+                {
+                    GuiGlobalParamsViewModel.Instance.Save();
+                }
+                else if (GuiGlobalParamsViewModel.Instance.AskAboutSettingsChangesOnClose)
+                {
+                    var result = ExitMsgBox.Show("Unsaved Changes", "You have unsaved changes to your global settings. Do you want to save before exiting?", "Yes", "No", "Yes and don't ask again", "No and don't ask again");
+
+                    if (result == MessageBoxResult.Yes)
+                    {
+                        GuiGlobalParamsViewModel.Instance.Save();
+                    }
+                    else if (result == MessageBoxResult.No)
+                    {
+                        // do nothing, just exit
+                    }
+                    // Yes and don't ask
+                    else if (result == MessageBoxResult.OK)
+                    {
+                        GuiGlobalParamsViewModel.Instance.OverwriteSettingsWithoutAsking = true;
+                        GuiGlobalParamsViewModel.Instance.AskAboutSettingsChangesOnClose = false;
+                        GuiGlobalParamsViewModel.Instance.Save();
+                    }
+                    // No and don't ask
+                    else if (result == MessageBoxResult.Cancel)
+                    {
+                        GuiGlobalParamsViewModel.Instance.OverwriteSettingsWithoutAsking = false;
+                        GuiGlobalParamsViewModel.Instance.AskAboutSettingsChangesOnClose = false;
+                        GuiGlobalParamsViewModel.Instance.Save();
+                    }
+                }
             }
         }
     }
