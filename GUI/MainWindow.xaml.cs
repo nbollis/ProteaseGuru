@@ -496,14 +496,12 @@ namespace GUI
                     {
                         foreach (string file in Directory.EnumerateFiles(draggedFilePath, "*.*", SearchOption.AllDirectories))
                         {
-                            AddAFile(file);
-                            ReloadAFile(file);
+                            ProcessDroppedFile(file);
                         }
                     }
                     else
                     {                        
-                        AddAFile(draggedFilePath);
-                        ReloadAFile(draggedFilePath);
+                        ProcessDroppedFile(draggedFilePath);
                     }                    
                     dataGridProteinDatabases.CommitEdit(DataGridEditingUnit.Row, true);                    
                     dataGridProteinDatabases.Items.Refresh();
@@ -518,6 +516,34 @@ namespace GUI
                     dataGridParameters.Items.Refresh();
                 }
             }            
+        }
+
+        // Process a dropped file and route it to the appropriate handler
+        private void ProcessDroppedFile(string filePath)
+        {
+            var filename = System.IO.Path.GetFileName(filePath);
+            var theExtension = System.IO.Path.GetExtension(filename).ToLowerInvariant();
+            bool compressed = theExtension.EndsWith("gz");
+            theExtension = compressed ? System.IO.Path.GetExtension(System.IO.Path.GetFileNameWithoutExtension(filename)).ToLowerInvariant() : theExtension;
+
+            switch (theExtension)
+            {
+                case ".xml":
+                case ".fasta":
+                case ".fa":
+                    // Protein databases go to both collections
+                    AddAFile(filePath);
+                    ReloadAFile(filePath);
+                    break;
+                case ".tsv":
+                case ".toml":
+                    // Results and parameters only go to reload collection
+                    ReloadAFile(filePath);
+                    break;
+                default:
+                    GuiWarnHandler(null, new StringEventArgs("Unrecognized file type: " + theExtension, null));
+                    break;
+            }
         }
         
 
