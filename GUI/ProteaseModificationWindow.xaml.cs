@@ -1,4 +1,4 @@
-﻿using Proteomics;
+using Proteomics;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -126,18 +126,18 @@ namespace GUI
             {
                 List<string> temp = new List<string> { modification.ToString(), @"//" };
                 File.WriteAllLines(tempPath, temp);
-                var parsedMods = UsefulProteomicsDatabases.PtmListLoader.ReadModsFromFile(tempPath, out var errors);
+                var parsedMods = Omics.Modifications.IO.ModificationLoader.ReadModsFromFile(tempPath, out var errors);
 
                 if (parsedMods.Count() != 1)
                 {
-                    MessageBox.Show("Problem parsing custom mod: One mod was expected, a different number was generated", "Error", MessageBoxButton.OK, MessageBoxImage.Hand);
+                    NotificationService.Instance.AddNotification("Problem parsing custom mod: One mod was expected, a different number was generated", NotificationType.Error);
                     return;
                 }
 
                 if (errors.Any())
                 {
                     string concatErrors = string.Join(Environment.NewLine, errors.Select(p => p.Item2));
-                    MessageBox.Show("Problem(s) parsing custom mod: " + Environment.NewLine + concatErrors, "Error", MessageBoxButton.OK, MessageBoxImage.Hand);
+                    NotificationService.Instance.AddNotification("Problem(s) parsing custom mod: " + Environment.NewLine + concatErrors, NotificationType.Error);
                     return;
                 }
 
@@ -145,7 +145,7 @@ namespace GUI
             }
             catch (Exception ex)
             {
-                MessageBox.Show("Problem parsing custom mod: " + ex.Message, "Error", MessageBoxButton.OK, MessageBoxImage.Hand);
+                NotificationService.Instance.AddNotification("Problem parsing custom mod: " + ex.Message, NotificationType.Error);
                 File.Delete(tempPath);
                 return;
             }
@@ -160,14 +160,15 @@ namespace GUI
             }
             catch (Exception ex)
             {
-                MessageBox.Show("Problem saving custom mod to file: " + ex.Message, "Error", MessageBoxButton.OK, MessageBoxImage.Hand);
+                NotificationService.Instance.AddNotification("Problem saving custom mod to file: " + ex.Message, NotificationType.Error);
                 return;
             }
 
             GlobalVariables.AddMods(new List<Modification> { modification }, false);
-            GlobalVariables.ProteaseMods = UsefulProteomicsDatabases.PtmListLoader.ReadModsFromFile(proteaseModFilePath, out var errorList).ToList();
+            GlobalVariables.ProteaseMods = Omics.Modifications.IO.ModificationLoader.ReadModsFromFile(proteaseModFilePath, out var errorList).ToList();
             DialogResult = true;
             proteaseModAdded = true;
+            NotificationService.Instance.AddNotification($"Custom protease modification '{modName}' saved successfully!", NotificationType.Success);
         }
 
         private void ClearCustomProteaseMod_Click(object sender, RoutedEventArgs e)

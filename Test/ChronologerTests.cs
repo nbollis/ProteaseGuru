@@ -25,12 +25,12 @@ internal class ChronologerTests
             string databasePath = Path.Combine(TestContext.CurrentContext.TestDirectory, "Databases", "TestDatabase_1.fasta");
             DbForDigestion database = new DbForDigestion(databasePath);
 
-            Parameters param = new Parameters();
+            RunParameters param = new RunParameters();
             param.TreatModifiedPeptidesAsDifferent = false;
             param.OutputFolder = subFolder;
 
             DigestionParams trypsin = new DigestionParams(
-                protease: "trypsin (cleave before proline)",
+                protease: "trypsin|P",
                 maxMissedCleavages: 0,
                 minPeptideLength: 7,// Chronologer works best with peptides >= 7 AA
                 maxPeptideLength: 50);// Chronologer has max length limit
@@ -103,7 +103,7 @@ internal class ChronologerTests
                 "TestProtein");
 
             var digestionParams = new DigestionParams(
-                protease: "trypsin (cleave before proline)",
+                protease: "trypsin|P",
                 maxMissedCleavages: 0,
                 minPeptideLength: 7,
                 maxPeptideLength: 50);
@@ -165,7 +165,7 @@ internal class ChronologerTests
 
             // Use correct protease name from the dictionary
             var digestionParams = new DigestionParams(
-                protease: "trypsin (cleave before proline)",
+                protease: "trypsin|P",
                 maxMissedCleavages: 0,
                 minPeptideLength: 7,
                 maxPeptideLength: 50);
@@ -238,12 +238,12 @@ MSFVNGNEIFTAARKQGHYAVGAFNTNNLEWTRKPEPTIDESAMPLERKNTPVLIQVSMGAAKYLVKTLVEEEMRK";
             DbForDigestion database = new DbForDigestion(fastaPath);
 
             // Set up parameters with trypsin and default settings
-            Parameters param = new Parameters();
+            RunParameters param = new RunParameters();
             param.TreatModifiedPeptidesAsDifferent = false;
             param.OutputFolder = subFolder;
 
             DigestionParams trypsin = new DigestionParams(
-                protease: "trypsin (cleave before proline)",
+                protease: "trypsin|P",
                 maxMissedCleavages: 0,
                 minPeptideLength: 7,// Chronologer works best with peptides >= 7 AA
                 maxPeptideLength: 50);// Chronologer has max length limit
@@ -352,12 +352,12 @@ MSFVNGNEIFTAARKQGHYAVGAFNTNNLEWTRKPEPTIDESAMPLERKNTPVLIQVSMGAAKYLVKTLVEEEMRK";
             string databasePath = Path.Combine(TestContext.CurrentContext.TestDirectory, "Databases", "TestDatabase_1.fasta");
             DbForDigestion database = new DbForDigestion(databasePath);
 
-            Parameters param = new Parameters();
+            RunParameters param = new RunParameters();
             param.TreatModifiedPeptidesAsDifferent = false;
             param.OutputFolder = subFolder;
 
             DigestionParams trypsin = new DigestionParams(
-                protease: "trypsin (cleave before proline)",
+                protease: "trypsin|P",
                 maxMissedCleavages: 0,
                 minPeptideLength: 7,// Chronologer works best with peptides >= 7 AA
                 maxPeptideLength: 50);// Chronologer has max length limit
