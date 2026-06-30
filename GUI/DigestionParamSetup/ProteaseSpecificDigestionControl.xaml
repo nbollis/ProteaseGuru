@@ -4,7 +4,7 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:GUI"
-             xmlns:guiFunctions="clr-namespace:GuiFunctions;assembly=GuiFunctions"
+             xmlns:guiFunctions="clr-namespace:GuiFunctions;assembly=GuruGuiFunctions"
              mc:Ignorable="d" 
              d:DesignHeight="120" d:DesignWidth="600"
              d:DataContext="{d:DesignInstance guiFunctions:ProteaseSpecificParametersViewModel, IsDesignTimeCreatable=False}">

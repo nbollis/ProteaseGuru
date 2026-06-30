@@ -6,7 +6,7 @@
              mc:Ignorable="d"
              xmlns:gui="clr-namespace:GUI"
              xmlns:local="clr-namespace:GUI"
-             xmlns:guiFunctions="clr-namespace:GuiFunctions;assembly=GuiFunctions"
+             xmlns:guiFunctions="clr-namespace:GuiFunctions;assembly=GuruGuiFunctions"
              d:DesignHeight="600" d:DesignWidth="1200">
     <UserControl.Resources>
 

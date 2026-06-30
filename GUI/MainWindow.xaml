@@ -4,7 +4,7 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:GUI"
-        xmlns:guiFunctions="clr-namespace:GuiFunctions;assembly=GuiFunctions"
+        xmlns:guiFunctions="clr-namespace:GuiFunctions;assembly=GuruGuiFunctions"
         mc:Ignorable="d"
         Drop="Window_Drop" AllowDrop="true" 
         WindowStartupLocation="CenterScreen"
